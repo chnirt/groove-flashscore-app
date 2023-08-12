@@ -5,6 +5,20 @@ export default {
     extend: {
       colors: {
         primary: 'var(--adm-color-primary)',
+        secondary: 'var(--adm-color-secondary)',
+        tertiary: 'var(--adm-color-tertiary)',
+        quaternary: 'var(--adm-color-quaternary)',
+        black1: '#555767',
+        black2: '#2B2D41',
+        gray1: '#575757',
+
+        bgPrimary: 'var(--adm-background-primary)',
+      },
+      borderRadius: {
+        '4xl': '1.75rem' /* 24px */,
+      },
+      borderWidth: {
+        1: '1px',
       },
     },
   },

@@ -37,9 +37,10 @@ const NewTeam = () => {
         Loading.get.show()
         const { teamName, teamLogo } = values
         const uid = user.uid
+        const logo = Array.isArray(teamLogo) ? teamLogo : [{ url: teamLogo }]
         const teamData = {
           name: teamName,
-          logo: teamLogo,
+          logo,
           uid,
         }
 

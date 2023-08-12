@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    height: -webkit-fill-available;
+  }
+
+  body {
+    height: -webkit-fill-available;
+  }
+
+  /* If using React, set height on the root div as well */
+  #root {
+    height: -webkit-fill-available;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -15,7 +31,12 @@
 
 :root:root {
   /* --adm-color-primary: #472f5b; */
-  --adm-color-primary: #e40177;
+  --adm-color-primary: #ff2882;
+  --adm-color-secondary: #ff793f;
+  --adm-color-tertiary: #37003c;
+  --adm-color-quaternary: #aeaeae;
+
+  --adm-background-primary: #f7f7f7;
 }
 
 .h-screen {

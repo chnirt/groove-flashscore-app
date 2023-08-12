@@ -41,7 +41,12 @@ const BottomTabBar: FC = () => {
       }}
     >
       {tabs.map((item) => (
-        <TabBar.Item key={item.key} icon={item.icon} title={item.title} />
+        <TabBar.Item
+          className="pt-5"
+          key={item.key}
+          icon={item.icon}
+          title={item.title}
+        />
       ))}
     </TabBar>
   )

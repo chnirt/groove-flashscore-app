@@ -1,40 +1,84 @@
-import { Avatar, ProgressBar } from 'antd-mobile'
-import { SearchOutline } from 'antd-mobile-icons'
-import {
-  // LiveMatchCard,
-  TeamButton,
-} from '../Dashboard'
+import { NavBar, ProgressBar } from 'antd-mobile'
+import { LiveMatchCard, TeamButton } from '../Dashboard'
+import { ArrowLeft } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { routes } from '../../routes'
+import useAuth from '../../hooks/useAuth'
+import { getDocRef, getDocument } from '../../firebase/service'
 
 const Match = () => {
+  const { matchId } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const [match, setMatch] = useState<any | undefined>()
+  const [selectedIndex, setSelectedIndex] = useState<number>(0)
+
+  const fetchMatchById = useCallback(
+    async (matchId: string) => {
+      if (user === null) return
+      if (matchId === undefined) return
+      // setLoading(true)
+      const matchDocRef = getDocRef('matches', matchId)
+      const matchDocData: any = await getDocument(matchDocRef)
+      setMatch(matchDocData)
+    },
+    [user]
+  )
+
+  useEffect(() => {
+    const handleFetchMatch = async () => {
+      try {
+        if (matchId === undefined) return
+        if (typeof fetchMatchById !== 'function') return
+        await fetchMatchById(matchId)
+      } catch (e) {
+        navigate(routes.error)
+      }
+    }
+
+    handleFetchMatch()
+  }, [matchId, fetchMatchById, navigate])
+
   return (
     <div className="flex flex-col">
-      <div className="flex h-14 items-center justify-between border-[1px] border-black p-4">
-        <Avatar
-          className="border-2 border-white"
-          src="https://t4.ftcdn.net/jpg/05/42/36/11/360_F_542361185_VFRJWpR2FH5OiAEVveWO7oZnfSccZfD3.jpg"
-          style={{
-            '--size': '24px',
-          }}
-        />
-        <h6 className="m-0">FlashScore</h6>
-
-        <button className="flex items-center justify-center">
-          <SearchOutline className="h-6 w-6" />
-        </button>
-      </div>
+      <NavBar
+        style={{
+          '--height': '76px',
+        }}
+        back={
+          <button
+            className="rounded-2xl bg-white p-2"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+        }
+        backArrow={false}
+      >
+        New Team
+      </NavBar>
 
       <div className="flex flex-col gap-8 p-4">
-        {/* <LiveMatchCard match={} /> */}
+        {match ? <LiveMatchCard match={match} /> : <div>Loading</div>}
 
         <div className="flex flex-col gap-5 rounded-3xl bg-white px-5 py-7">
           <div className="flex gap-4">
-            {['Stats', 'Line-up', 'Summary'].map((team) => (
-              <TeamButton className="flex flex-1" title={team} />
+            {['Stats', 'Line-up', 'Summary'].map((name: string, ti: number) => (
+              <TeamButton
+                key={`tab-${ti}`}
+                className="flex flex-1"
+                team={{
+                  name,
+                }}
+                selected={selectedIndex === ti}
+                onClick={() => setSelectedIndex(ti)}
+              />
             ))}
           </div>
           <div className="flex flex-col gap-3">
-            {['Shots', 'Yellow card', 'Red card'].map((stat) => (
-              <div>
+            {['Shots', 'Yellow card', 'Red card'].map((stat, si: number) => (
+              <div key={`stat-${si}`}>
                 <div className="flex justify-between">
                   <h2>0</h2>
                   <h2>{stat}</h2>
