@@ -42,6 +42,7 @@ export const MASTER_MOCK_DATA = {
       : [],
   },
   NEW_MATCH: {
+    groupStage: IS_DEVELOP ? 'Round of 3' : '',
     homeTeamId: '',
     awayTeamId: '',
     playDate: IS_DEVELOP ? new Date() : null,

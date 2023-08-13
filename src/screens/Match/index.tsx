@@ -83,18 +83,24 @@ const Match = () => {
             {[
               {
                 title: 'Shots',
-                home: 2,
-                away: 6,
+                // home: 2,
+                // away: 6,
+                home: 0,
+                away: 0,
               },
               {
                 title: 'Yellow card',
-                home: 3,
-                away: 2,
+                // home: 3,
+                // away: 2,
+                home: 0,
+                away: 0,
               },
               {
                 title: 'Red card',
-                home: 1,
-                away: 1,
+                // home: 1,
+                // away: 1,
+                home: 0,
+                away: 0,
               },
             ].map((stat, si: number) => (
               <Stat key={`stat-${si}`} stat={stat} />

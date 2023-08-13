@@ -1,6 +1,7 @@
 import { Avatar, NavBar, PullToRefresh } from 'antd-mobile'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
+import moment from 'moment'
 import { routes } from '../../routes'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import MatchCard from './components/MatchCard'
@@ -27,8 +28,18 @@ const Dashboard = () => {
     )
     return result
   }, [matches, selectedIndex, formattedTeams])
-  const myLiveMatches = useMemo(() => filteredMatches, [filteredMatches])
-  const myMatches = useMemo(() => filteredMatches, [filteredMatches])
+  const myLiveMatches = useMemo(() => {
+    const result = filteredMatches?.filter((match) =>
+      moment(match.playDate.toDate()).isSameOrBefore(moment())
+    )
+    return result
+  }, [filteredMatches])
+  const myMatches = useMemo(() => {
+    const result = filteredMatches?.filter((match) =>
+      moment(match.playDate.toDate()).isAfter(moment())
+    )
+    return result
+  }, [filteredMatches])
 
   const navigateMatch = useCallback(
     (match: MatchType) => {
@@ -101,7 +112,13 @@ const Dashboard = () => {
       <PullToRefresh onRefresh={onRefresh}>
         <div className="my-4 flex flex-col gap-8">
           <div className="no-scrollbar flex gap-5 overflow-x-scroll px-4">
-            {teams?.length ? (
+            {teams?.length === undefined ? (
+              <div>Loading</div> ? (
+                teams?.length === 0
+              ) : (
+                <div>No data</div>
+              )
+            ) : (
               formattedTeams.map((team, ti: number) => (
                 <TeamButton
                   key={`team-${ti}`}
@@ -110,19 +127,19 @@ const Dashboard = () => {
                   onClick={() => handleSelectTeam(ti)}
                 />
               ))
-            ) : (
-              <div>Loading</div>
             )}
           </div>
 
-          <div className="flex flex-col gap-7">
-            <div className="px-4">
-              <p className="m-0 text-lg font-bold text-gray1">Live Matches</p>
-            </div>
-            <div className="no-scrollbar flex overflow-scroll px-4">
-              <div className="flex gap-4">
-                {myLiveMatches?.length ? (
-                  myLiveMatches.map((liveMatch, lmi) => (
+          {myLiveMatches?.length === undefined ? (
+            <div className="px-4">Loading</div>
+          ) : myLiveMatches.length === 0 ? null : (
+            <div className="flex flex-col gap-7">
+              <div className="px-4">
+                <p className="m-0 text-lg font-bold text-gray1">Live Matches</p>
+              </div>
+              <div className="no-scrollbar flex overflow-scroll px-4">
+                <div className="flex gap-4">
+                  {myLiveMatches.map((liveMatch, lmi) => (
                     <LiveMatchCard
                       key={`live-match-${lmi}`}
                       className="min-h-[13rem] w-72"
@@ -130,13 +147,11 @@ const Dashboard = () => {
                       selected={lmi === 0}
                       onClick={() => navigateMatch(liveMatch)}
                     />
-                  ))
-                ) : (
-                  <div>Loading</div>
-                )}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-4">
@@ -150,7 +165,9 @@ const Dashboard = () => {
               ) : null}
             </div>
             <div className="flex flex-col gap-4 px-4">
-              {myMatches?.length ? (
+              {myMatches?.length === undefined ? (
+                <div>Loading</div>
+              ) : myMatches.length === 0 ? null : (
                 myMatches.map((match, mi: number) => (
                   <MatchCard
                     key={`match-${mi}`}
@@ -158,8 +175,6 @@ const Dashboard = () => {
                     onClick={() => navigateMatch(match)}
                   />
                 ))
-              ) : (
-                <div>Loading</div>
               )}
             </div>
           </div>

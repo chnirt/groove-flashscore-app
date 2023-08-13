@@ -1,3 +1,4 @@
+import moment from 'moment'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 import { LiveMatchCardProps } from '../LiveMatchCard'
 
@@ -10,15 +11,17 @@ const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0].url
+  const time = moment(match.playDate.toDate()).format('hh:mm')
+  const date = moment(match.playDate.toDate())
+    .format('DD MMM')
+    .toUpperCase()
   return (
     <button
       className="flex min-h-[4rem] items-center justify-between gap-4 rounded-3xl bg-white px-6 py-4"
       onClick={onClick}
     >
       <div className="flex flex-1 items-center justify-end gap-2">
-        <p className="m-0 line-clamp-1 text-right text-base font-semibold text-black2">
-          {homeName}
-        </p>
+        <p className="m-0 text-base font-semibold text-black2">{homeName}</p>
         {homeTeamLogo ? (
           <img
             className="h-8 w-8 object-contain"
@@ -28,9 +31,9 @@ const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
         ) : null}
       </div>
       <div className="flex flex-col items-center justify-center gap-1">
-        <p className="m-0 text-base font-extrabold text-secondary">06:30</p>
+        <p className="m-0 text-base font-extrabold text-secondary">{time}</p>
         <p className="m-0 flex items-center justify-center rounded-lg text-xs font-semibold text-quaternary">
-          30 OCT
+          {date}
         </p>
       </div>
       <div className="flex flex-1 items-center gap-2">
@@ -41,7 +44,7 @@ const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
             alt={`logo-${awayTeamLogo}`}
           />
         ) : null}
-        <p className="m-0 line-clamp-1 text-left text-base font-semibold text-black2">
+        <p className="m-0 text-left text-base font-semibold text-black2">
           {awayTeamName}
         </p>
       </div>

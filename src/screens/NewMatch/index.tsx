@@ -3,6 +3,7 @@ import {
   DatePicker,
   DatePickerRef,
   Form,
+  Input,
   NavBar,
   Toast,
 } from 'antd-mobile'
@@ -31,10 +32,11 @@ const NewMatch = () => {
       if (user === null) return
       try {
         Loading.get.show()
-        const { homeTeamId, awayTeamId, playDate } = values
+        const { groupStage, homeTeamId, awayTeamId, playDate } = values
         if (playDate === null) return
         const uid = user.uid
         const matchData = {
+          groupStage,
           homeTeamId,
           awayTeamId,
           playDate: Timestamp.fromDate(playDate),
@@ -111,6 +113,19 @@ const NewMatch = () => {
         }
       >
         <Form.Header>New Team</Form.Header>
+        <Form.Item
+          name="groupStage"
+          label="Group Stage"
+          rules={[
+            {
+              required: true,
+              message: 'Group Stage is required',
+            },
+          ]}
+          shouldUpdate
+        >
+          <Input autoComplete="none" placeholder="Round of 3" />
+        </Form.Item>
         <Form.Item
           name="homeTeamId"
           label="Home Team"

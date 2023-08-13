@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react'
 import { getColRef } from '../../firebase/service'
-import { getDocs, query } from 'firebase/firestore'
+import { getDocs, orderBy, query } from 'firebase/firestore'
 
 type FlashScoreType = {
   teams?: any[]
@@ -49,7 +49,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   const refetchMatch = useCallback(async () => {
     try {
       const matchColGroupRef = getColRef('matches')
-      const q = query(matchColGroupRef)
+      const q = query(matchColGroupRef, orderBy('playDate', 'asc'))
       querySnapshot = await getDocs(q)
       const matchDocs = querySnapshot.docs.map((doc) => ({
         id: doc.id,

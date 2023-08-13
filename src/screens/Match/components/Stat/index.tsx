@@ -5,7 +5,8 @@ type Stat = { title: string; home: number; away: number }
 const Stat = ({ stat }: { stat: Stat }) => {
   const win = stat.home > stat.away
   const draw = stat.home === stat.away
-  const sumPercent = stat.home + stat.away
+  const isAllZero = stat.home === 0 && stat.away === 0
+  const sumPercent = isAllZero ? 1 : stat.home + stat.away
   const homePercent = (stat.home / sumPercent) * 100
   const awayPercent = (stat.away / sumPercent) * 100
   return (

@@ -25,7 +25,7 @@ const BottomTabBar: FC = () => {
         icon: <GoHomeFill className="h-7 w-7" />,
       },
       {
-        key: routes.laws,
+        key: routes.rules,
         icon: <GoLaw />,
       },
       {
