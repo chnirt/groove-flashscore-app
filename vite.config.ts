@@ -7,5 +7,8 @@ export default defineConfig({
     host: true,
     port: 3001,
   },
+  build: {
+    sourcemap: 'hidden',
+  },
   plugins: [react()],
 })

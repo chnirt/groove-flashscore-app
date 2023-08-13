@@ -13,6 +13,9 @@ export const routes = {
   newTeam: '/newTeam',
   newMatch: '/newMatch',
   match: '/match/:matchId',
+  laws: '/laws',
+  ranking: '/ranking',
+
   me: '/me',
 
   error: '/error',
@@ -24,22 +27,38 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       {
+        path: routes.app,
+        element: <App />,
+        children: [
+          {
+            path: routes.dashboard,
+            element: (
+              <Loadable
+                {...{
+                  factory: () => import('../screens/Dashboard'),
+                }}
+              />
+            ),
+          },
+          {
+            path: routes.match,
+            element: (
+              <Loadable
+                {...{
+                  factory: () => import('../screens/Match'),
+                }}
+              />
+            ),
+          },
+        ],
+      },
+      {
         element: <PrivateRoute />,
         children: [
           {
             path: routes.app,
             element: <App />,
             children: [
-              {
-                path: routes.dashboard,
-                element: (
-                  <Loadable
-                    {...{
-                      factory: () => import('../screens/Dashboard'),
-                    }}
-                  />
-                ),
-              },
               {
                 path: routes.newTeam,
                 element: (
@@ -56,16 +75,6 @@ export const router = createBrowserRouter([
                   <Loadable
                     {...{
                       factory: () => import('../screens/NewMatch'),
-                    }}
-                  />
-                ),
-              },
-              {
-                path: routes.match,
-                element: (
-                  <Loadable
-                    {...{
-                      factory: () => import('../screens/Match'),
                     }}
                   />
                 ),

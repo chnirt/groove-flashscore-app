@@ -6,17 +6,17 @@ import {
   NavBar,
   Toast,
 } from 'antd-mobile'
-import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { GoArrowLeft } from 'react-icons/go'
+import dayjs from 'dayjs'
+import { Select } from 'antd'
+import { RefObject, useCallback } from 'react'
+import { Timestamp } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { MASTER_MOCK_DATA } from '../../mocks'
-import { RefObject, useCallback } from 'react'
 import { addDocument, getColRef } from '../../firebase/service'
 import { Loading } from '../../global'
-import dayjs from 'dayjs'
-import { Select } from 'antd'
-import { Timestamp } from 'firebase/firestore'
 
 const initialValues = MASTER_MOCK_DATA.NEW_MATCH
 
@@ -60,7 +60,7 @@ const NewMatch = () => {
         })
 
         return
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Toast.show({
           icon: 'error',
@@ -81,10 +81,10 @@ const NewMatch = () => {
         }}
         back={
           <button
-            className="rounded-2xl bg-white p-2"
+            className="h-10 w-10 rounded-2xl bg-white p-2"
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="h-6 w-6" />
+            <GoArrowLeft className="h-6 w-6 text-black2" />
           </button>
         }
         backArrow={false}

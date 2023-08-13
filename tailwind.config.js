@@ -11,6 +11,8 @@ export default {
         black1: '#555767',
         black2: '#2B2D41',
         gray1: '#575757',
+        gray2: '#F5F5F5',
+        gray3: '#737373',
 
         bgPrimary: 'var(--adm-background-primary)',
       },

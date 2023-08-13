@@ -1,11 +1,13 @@
-import { NavBar, ProgressBar } from 'antd-mobile'
-import { LiveMatchCard, TeamButton } from '../Dashboard'
-import { ArrowLeft } from 'lucide-react'
+import { NavBar } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
+import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
 import { routes } from '../../routes'
-import useAuth from '../../hooks/useAuth'
 import { getDocRef, getDocument } from '../../firebase/service'
+import LiveMatchCard from '../Dashboard/components/LiveMatchCard'
+import MatchButton from './components/MatchButton'
+import useAuth from '../../hooks/useAuth'
+import Stat from './components/Stat'
 
 const Match = () => {
   const { matchId } = useParams()
@@ -14,17 +16,12 @@ const Match = () => {
   const [match, setMatch] = useState<any | undefined>()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
 
-  const fetchMatchById = useCallback(
-    async (matchId: string) => {
-      if (user === null) return
-      if (matchId === undefined) return
-      // setLoading(true)
-      const matchDocRef = getDocRef('matches', matchId)
-      const matchDocData: any = await getDocument(matchDocRef)
-      setMatch(matchDocData)
-    },
-    [user]
-  )
+  const fetchMatchById = useCallback(async (matchId: string) => {
+    if (matchId === undefined) return
+    const matchDocRef = getDocRef('matches', matchId)
+    const matchDocData: any = await getDocument(matchDocRef)
+    setMatch(matchDocData)
+  }, [])
 
   useEffect(() => {
     const handleFetchMatch = async () => {
@@ -48,26 +45,32 @@ const Match = () => {
         }}
         back={
           <button
-            className="rounded-2xl bg-white p-2"
+            className="h-10 w-10 rounded-2xl bg-white p-2"
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="h-6 w-6" />
+            <GoArrowLeft className="h-6 w-6 text-black2" />
           </button>
         }
         backArrow={false}
+        right={
+          user ? (
+            <button className="h-10 w-10 rotate-90 rounded-2xl bg-white p-2">
+              <GoKebabHorizontal className="h-6 w-6 text-black2" />
+            </button>
+          ) : null
+        }
       >
-        New Team
+        {match?.groupStage ? match.groupStage : <div>Loading</div>}
       </NavBar>
 
       <div className="flex flex-col gap-8 p-4">
         {match ? <LiveMatchCard match={match} /> : <div>Loading</div>}
 
-        <div className="flex flex-col gap-5 rounded-3xl bg-white px-5 py-7">
+        <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
           <div className="flex gap-4">
             {['Stats', 'Line-up', 'Summary'].map((name: string, ti: number) => (
-              <TeamButton
+              <MatchButton
                 key={`tab-${ti}`}
-                className="flex flex-1"
                 team={{
                   name,
                 }}
@@ -77,22 +80,24 @@ const Match = () => {
             ))}
           </div>
           <div className="flex flex-col gap-3">
-            {['Shots', 'Yellow card', 'Red card'].map((stat, si: number) => (
-              <div key={`stat-${si}`}>
-                <div className="flex justify-between">
-                  <h2>0</h2>
-                  <h2>{stat}</h2>
-                  <h2>0</h2>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <ProgressBar className="rotate-180" percent={50} />
-                  </div>
-                  <div className="flex-1">
-                    <ProgressBar percent={50} />
-                  </div>
-                </div>
-              </div>
+            {[
+              {
+                title: 'Shots',
+                home: 2,
+                away: 6,
+              },
+              {
+                title: 'Yellow card',
+                home: 3,
+                away: 2,
+              },
+              {
+                title: 'Red card',
+                home: 1,
+                away: 1,
+              },
+            ].map((stat, si: number) => (
+              <Stat key={`stat-${si}`} stat={stat} />
             ))}
           </div>
         </div>

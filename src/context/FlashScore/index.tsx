@@ -7,8 +7,7 @@ import {
   useState,
 } from 'react'
 import { getColRef } from '../../firebase/service'
-import { getDocs, query, where } from 'firebase/firestore'
-import useAuth from '../../hooks/useAuth'
+import { getDocs, query } from 'firebase/firestore'
 
 type FlashScoreType = {
   teams?: any[]
@@ -24,15 +23,13 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { user } = useAuth()
   const [teams, setTeams] = useState<any[] | undefined>()
   const [matches, setMatches] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
     try {
-      if (user?.uid === undefined) return
       const teamColGroupRef = getColRef('teams')
-      const q = query(teamColGroupRef, where('uid', '==', user.uid))
+      const q = query(teamColGroupRef)
       querySnapshot = await getDocs(q)
       const teamDocs = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -42,7 +39,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (error) {
       console.log(error)
     }
-  }, [user])
+  }, [])
 
   const fetchTeam = useCallback(async () => {
     if (teams?.length) return
@@ -51,9 +48,8 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const refetchMatch = useCallback(async () => {
     try {
-      if (user?.uid === undefined) return
       const matchColGroupRef = getColRef('matches')
-      const q = query(matchColGroupRef, where('uid', '==', user.uid))
+      const q = query(matchColGroupRef)
       querySnapshot = await getDocs(q)
       const matchDocs = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -63,7 +59,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (error) {
       console.log(error)
     }
-  }, [user])
+  }, [])
 
   const fetchMatch = useCallback(async () => {
     if (teams?.length) return

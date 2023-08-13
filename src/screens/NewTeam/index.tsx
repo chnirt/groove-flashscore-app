@@ -10,7 +10,6 @@ import {
   Toast,
 } from 'antd-mobile'
 import { useCallback } from 'react'
-import { ArrowLeft, PlusCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import { Loading } from '../../global'
@@ -18,6 +17,7 @@ import useAuth from '../../hooks/useAuth'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
 import { addDocument, getColRef } from '../../firebase/service'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
+import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
 
 const initialValues = MASTER_MOCK_DATA.NEW_TEAM
 
@@ -83,10 +83,10 @@ const NewTeam = () => {
         }}
         back={
           <button
-            className="rounded-2xl bg-white p-2"
+            className="h-10 w-10 rounded-2xl bg-white p-2"
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="h-6 w-6" />
+            <GoArrowLeft className="h-6 w-6 text-black2" />
           </button>
         }
         backArrow={false}
@@ -226,7 +226,7 @@ const NewTeam = () => {
               name="teamLogo"
               renderAdd={() => (
                 <Button color="primary" fill="none">
-                  <PlusCircle /> Add
+                  <GoPlusCircle /> Add
                 </Button>
               )}
               renderHeader={({ index }, { remove }) => (
