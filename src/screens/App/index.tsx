@@ -3,7 +3,7 @@ import BottomTabBar from '../../components/BottomTabBar'
 
 const App = () => {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       <div className="flex flex-1 flex-col">
         <Outlet />
       </div>

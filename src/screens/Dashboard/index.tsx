@@ -13,9 +13,22 @@ const Dashboard = () => {
   const { user } = useAuth()
   const { teams, fetchTeam, refetchTeam, matches, fetchMatch, refetchMatch } =
     useFlashScore()
-  const myLiveMatches = useMemo(() => matches, [matches])
-  const myMatches = useMemo(() => matches, [matches])
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const formattedTeams = useMemo(
+    () => (teams ? [{ name: 'All' }, ...teams] : []),
+    [teams]
+  )
+  const filteredMatches = useMemo(() => {
+    if (selectedIndex === 0) return matches
+    const foundTeam = formattedTeams[selectedIndex]
+    if (foundTeam === undefined) return matches
+    const result = matches?.filter((match) =>
+      [match.homeTeamId, match.awayTeamId].includes(foundTeam.id)
+    )
+    return result
+  }, [matches, selectedIndex, formattedTeams])
+  const myLiveMatches = useMemo(() => filteredMatches, [filteredMatches])
+  const myMatches = useMemo(() => filteredMatches, [filteredMatches])
 
   const navigateMatch = useCallback(
     (match: MatchType) => {
@@ -23,6 +36,10 @@ const Dashboard = () => {
     },
     [navigate]
   )
+
+  const handleSelectTeam = useCallback((teamIndex: number) => {
+    setSelectedIndex(teamIndex)
+  }, [])
 
   const onRefresh = useCallback(async () => {
     if (refetchTeam === undefined) return
@@ -85,12 +102,12 @@ const Dashboard = () => {
         <div className="my-4 flex flex-col gap-8">
           <div className="no-scrollbar flex gap-5 overflow-x-scroll px-4">
             {teams?.length ? (
-              [{ name: 'All' }, ...teams].map((team, ti: number) => (
+              formattedTeams.map((team, ti: number) => (
                 <TeamButton
                   key={`team-${ti}`}
                   team={team}
                   selected={selectedIndex === ti}
-                  onClick={() => setSelectedIndex(ti)}
+                  onClick={() => handleSelectTeam(ti)}
                 />
               ))
             ) : (
