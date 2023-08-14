@@ -32,7 +32,7 @@ export const MASTER_MOCK_DATA = {
   },
   NEW_TEAM: {
     teamName: IS_DEVELOP ? 'Jupiter 1' : '',
-    uploadMethod: IS_DEVELOP ? 'file' : 'link',
+    uploadMethod: IS_DEVELOP ? 'file' : 'file',
     teamLogo: IS_DEVELOP
       ? [
           {
@@ -50,6 +50,10 @@ export const MASTER_MOCK_DATA = {
   NEW_PLAYER: {
     playerName: IS_DEVELOP ? 'Chnirt' : '',
     jerseyNumber: IS_DEVELOP ? '94' : '',
+  },
+  NEW_LINEUP: {
+    uploadMethod: 'file',
+    lineUpFile: [],
   },
 }
 

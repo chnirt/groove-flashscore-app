@@ -43,13 +43,8 @@ const NewMatch = () => {
           uid,
         }
 
-        // if (isEditMode) {
-        //   if (categoryDocRefState === null) return
-        //   await updateDocument(categoryDocRefState, categoryData)
-        // } else {
         const matchDocRef = getColRef('matches')
         await addDocument(matchDocRef, matchData)
-        // }
 
         if (typeof refetchMatch === 'function') {
           await refetchMatch()
@@ -58,7 +53,7 @@ const NewMatch = () => {
         navigate(-1)
         Toast.show({
           icon: 'success',
-          content: 'Match is added',
+          content: 'Added',
         })
 
         return
@@ -78,6 +73,7 @@ const NewMatch = () => {
   return (
     <div>
       <NavBar
+        className="sticky top-0 bg-bgPrimary"
         style={{
           '--height': '76px',
         }}

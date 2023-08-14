@@ -2,12 +2,14 @@ import { NavBar } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
+import { DocumentData, DocumentReference } from 'firebase/firestore'
 import { routes } from '../../routes'
 import { getDocRef, getDocument } from '../../firebase/service'
 import LiveMatchCard from '../Dashboard/components/LiveMatchCard'
 import MatchButton from './components/MatchButton'
 import useAuth from '../../hooks/useAuth'
 import Stat from './components/Stat'
+import LineUp from './components/LineUp'
 
 const Match = () => {
   const { matchId } = useParams()
@@ -15,10 +17,15 @@ const Match = () => {
   const { user } = useAuth()
   const [match, setMatch] = useState<any | undefined>()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
+    DocumentData,
+    DocumentData
+  > | null>(null)
 
   const fetchMatchById = useCallback(async (matchId: string) => {
     if (matchId === undefined) return
     const matchDocRef = getDocRef('matches', matchId)
+    setMatchDocRefState(matchDocRef)
     const matchDocData: any = await getDocument(matchDocRef)
     setMatch(matchDocData)
   }, [])
@@ -36,6 +43,39 @@ const Match = () => {
 
     handleFetchMatch()
   }, [matchId, fetchMatchById, navigate])
+
+  const renderTabContent = useCallback(() => {
+    switch (selectedIndex) {
+      case 0:
+        return [
+          {
+            title: 'Shots',
+            // home: 2,
+            // away: 6,
+            home: 0,
+            away: 0,
+          },
+          {
+            title: 'Yellow card',
+            // home: 3,
+            // away: 2,
+            home: 0,
+            away: 0,
+          },
+          {
+            title: 'Red card',
+            // home: 1,
+            // away: 1,
+            home: 0,
+            away: 0,
+          },
+        ].map((stat, si: number) => <Stat key={`stat-${si}`} stat={stat} />)
+      case 1:
+        return <LineUp matchDocRefState={matchDocRefState} match={match} />
+      default:
+        return null
+    }
+  }, [selectedIndex, matchDocRefState, match])
 
   return (
     <div className="flex flex-col">
@@ -79,33 +119,7 @@ const Match = () => {
               />
             ))}
           </div>
-          <div className="flex flex-col gap-3">
-            {[
-              {
-                title: 'Shots',
-                // home: 2,
-                // away: 6,
-                home: 0,
-                away: 0,
-              },
-              {
-                title: 'Yellow card',
-                // home: 3,
-                // away: 2,
-                home: 0,
-                away: 0,
-              },
-              {
-                title: 'Red card',
-                // home: 1,
-                // away: 1,
-                home: 0,
-                away: 0,
-              },
-            ].map((stat, si: number) => (
-              <Stat key={`stat-${si}`} stat={stat} />
-            ))}
-          </div>
+          <div className="flex flex-col gap-3">{renderTabContent()}</div>
         </div>
       </div>
     </div>

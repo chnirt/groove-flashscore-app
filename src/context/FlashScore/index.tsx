@@ -37,7 +37,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       }))
       setTeams(teamDocs)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }, [])
 
@@ -57,7 +57,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       }))
       setMatches(matchDocs)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }, [])
 

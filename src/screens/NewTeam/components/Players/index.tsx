@@ -35,8 +35,8 @@ const Players = ({ teamId }: { teamId: string }) => {
 
     handleFetchTeam()
   }, [teamId, fetchPlayers, navigate])
-  if (players === undefined) return <div>Loading</div>
-  if (players.length === 0) return <div>No data</div>
+  if (players === undefined) return <div className="px-4">Loading</div>
+  if (players.length === 0) return <div className="px-4">No data</div>
   return (
     <List header="Players" mode="card">
       {players.map((player, pi: number) => (

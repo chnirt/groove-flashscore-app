@@ -4,77 +4,57 @@ import {
   ImageUploadItem,
   ImageUploader,
   Input,
-  NavBar,
   Radio,
   Space,
   Toast,
+  Image,
 } from 'antd-mobile'
-import { useCallback, useEffect, useState } from 'react'
-import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
-import { MASTER_MOCK_DATA } from '../../mocks'
-import { Loading } from '../../global'
-import useAuth from '../../hooks/useAuth'
-import { uploadStorageBytesResumable } from '../../firebase/storage'
-import {
-  addDocument,
-  getColRef,
-  getDocRef,
-  getDocument,
-  updateDocument,
-} from '../../firebase/service'
-import useFlashScore from '../../context/FlashScore/useFlashScore'
-import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
-import { routes } from '../../routes'
+import { useCallback, useEffect } from 'react'
 import { DocumentData, DocumentReference } from 'firebase/firestore'
-import Players from './components/Players'
+import { GoPlusCircle } from 'react-icons/go'
+import { MASTER_MOCK_DATA } from '../../../../mocks'
+import { Loading } from '../../../../global'
+import useAuth from '../../../../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
+import { uploadStorageBytesResumable } from '../../../../firebase/storage'
+import { getDocument, updateDocument } from '../../../../firebase/service'
+import { routes } from '../../../../routes'
 
-const initialValues = MASTER_MOCK_DATA.NEW_TEAM
+const initialValues = MASTER_MOCK_DATA.NEW_LINEUP
 
 const maxCount = 1
 
-const NewTeam = () => {
-  const navigate = useNavigate()
+const LineUp = ({
+  matchDocRefState,
+  match,
+}: {
+  matchDocRefState: DocumentReference<DocumentData, DocumentData> | null
+  match: any
+}) => {
   const [form] = Form.useForm()
-  const { teamId } = useParams()
-  const isEditMode = teamId
-  const { user } = useAuth()
-  const { refetchTeam } = useFlashScore()
   const uploadMethod = Form.useWatch('uploadMethod', form)
-  const [teamDocRefState, setTeamDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
+  const navigate = useNavigate()
+  const { user } = useAuth()
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (user === null) return
+      if (matchDocRefState === null) return
       try {
         Loading.get.show()
-        const { teamName, teamLogo } = values
-        const uid = user.uid
-        const logo = Array.isArray(teamLogo) ? teamLogo : [{ url: teamLogo }]
-        const teamData = {
-          name: teamName,
-          logo,
-          uid,
+        const { lineUpFile } = values
+        const file = Array.isArray(lineUpFile)
+          ? lineUpFile
+          : [{ url: lineUpFile }]
+        const lineUpData = {
+          file,
         }
 
-        if (isEditMode) {
-          if (teamDocRefState === null) return
-          await updateDocument(teamDocRefState, teamData)
-        } else {
-          const teamDocRef = getColRef('teams')
-          await addDocument(teamDocRef, teamData)
-        }
+        await updateDocument(matchDocRefState, lineUpData)
 
-        if (typeof refetchTeam === 'function') {
-          await refetchTeam()
-        }
-
-        navigate(-1)
         Toast.show({
           icon: 'success',
-          content: isEditMode ? 'Saved' : 'Added',
+          content: 'LineUp is edited',
         })
 
         return
@@ -87,30 +67,25 @@ const NewTeam = () => {
         Loading.get.hide()
       }
     },
-    [user, navigate, refetchTeam, isEditMode, teamDocRefState]
+    [user, navigate, matchDocRefState]
   )
 
-  const fetchTeamById = useCallback(
-    async (teamId: string) => {
-      const teamDocRef = getDocRef('teams', teamId)
-      setTeamDocRefState(teamDocRef)
-      const teamDocData: any = await getDocument(teamDocRef)
-      const uploadMethod = form.getFieldValue('uploadMethod')
-      const isFile = uploadMethod === 'file'
+  const fetchLineUpById = useCallback(
+    async (matchDocRefState: any) => {
+      const lineUpDocData: any = await getDocument(matchDocRefState)
       form.setFieldsValue({
-        ...teamDocData,
-        teamName: teamDocData.name,
-        teamLogo: isFile ? teamDocData.logo : teamDocData.logo[0].url,
+        ...lineUpDocData,
+        lineUpFile: lineUpDocData.file,
       })
     },
     [form]
   )
 
   useEffect(() => {
-    if (teamId === undefined || typeof fetchTeamById !== 'function') return
+    if (typeof fetchLineUpById !== 'function') return
     const handleFetchTeam = async () => {
       try {
-        await fetchTeamById(teamId)
+        await fetchLineUpById(matchDocRefState)
         // do something
       } catch (e) {
         navigate(routes.error)
@@ -118,41 +93,10 @@ const NewTeam = () => {
     }
 
     handleFetchTeam()
-  }, [teamId, fetchTeamById, navigate])
+  }, [matchDocRefState, fetchLineUpById, navigate])
 
-  return (
-    <div>
-      <NavBar
-        className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
-        back={
-          <button
-            className="h-10 w-10 rounded-2xl bg-white p-2"
-            onClick={() => navigate(-1)}
-          >
-            <GoArrowLeft className="h-6 w-6 text-black2" />
-          </button>
-        }
-        backArrow={false}
-        right={
-          user && isEditMode ? (
-            <Link
-              to={generatePath(routes.newPlayer, {
-                teamId,
-              })}
-            >
-              <button className="bg-transparent text-base font-medium text-secondary">
-                New player
-              </button>
-            </Link>
-          ) : null
-        }
-      >
-        {isEditMode ? 'Edit Team' : 'New Team'}
-      </NavBar>
-
+  if (user)
+    return (
       <Form
         form={form}
         initialValues={initialValues}
@@ -167,49 +111,36 @@ const NewTeam = () => {
             size="large"
             shape="rounded"
           >
-            {isEditMode ? 'Save' : 'Add'}
+            Save
           </Button>
         }
       >
-        <Form.Header>New Team</Form.Header>
-        <Form.Item
-          name="teamName"
-          label="Team Name"
-          rules={[
-            {
-              required: true,
-              message: 'Team Name is required',
-            },
-          ]}
-          shouldUpdate
-        >
-          <Input autoComplete="none" placeholder="Jupiter" />
-        </Form.Item>
+        <Form.Header>LineUp</Form.Header>
         <Form.Item name="uploadMethod" label="Upload Method">
           <Radio.Group
             onChange={(updateMethod) => {
               if (maxCount === 1) {
                 if (updateMethod === 'file') {
-                  const teamLogo = form.getFieldValue('teamLogo')
-                  if (typeof teamLogo !== 'string') return
-                  form.setFieldsValue({ teamLogo: [{ url: teamLogo }] })
+                  const lineUpFile = form.getFieldValue('lineUpFile')
+                  if (typeof lineUpFile !== 'string') return
+                  form.setFieldsValue({ lineUpFile: [{ url: lineUpFile }] })
                   return
                 }
                 if (updateMethod === 'link') {
-                  const teamLogo = form
-                    .getFieldValue('teamLogo')
-                    .filter((teamFile: any) => Boolean(teamFile))
-                  if (!Array.isArray(teamLogo)) return
-                  form.setFieldsValue({ teamLogo: teamLogo[0].url })
+                  const lineUpFile = form
+                    .getFieldValue('lineUpFile')
+                    .filter((file: any) => Boolean(file))
+                  if (!Array.isArray(lineUpFile)) return
+                  form.setFieldsValue({ lineUpFile: lineUpFile[0].url })
                   return
                 }
                 return
               }
 
-              const teamLogo = form
-                .getFieldValue('teamLogo')
-                .filter((teamFile: any) => Boolean(teamFile))
-              form.setFieldsValue({ teamLogo })
+              const lineUpFile = form
+                .getFieldValue('lineUpFile')
+                .filter((file: any) => Boolean(file))
+              form.setFieldsValue({ lineUpFile })
             }}
           >
             <Space>
@@ -220,9 +151,9 @@ const NewTeam = () => {
         </Form.Item>
         {uploadMethod === 'file' && (
           <Form.Item
-            name="teamLogo"
-            label="Team Logo"
-            rules={[{ required: true, message: 'Team Logo is required' }]}
+            name="lineUpFile"
+            label="LineUp File"
+            rules={[{ required: true, message: 'LineUp File is required' }]}
           >
             <ImageUploader
               upload={function (file: File): Promise<ImageUploadItem> {
@@ -268,12 +199,12 @@ const NewTeam = () => {
         {uploadMethod === 'link' ? (
           maxCount === 1 ? (
             <Form.Item
-              name="teamLogo"
-              label="Team Logo"
+              name="lineUpFile"
+              label="LineUp File"
               rules={[
                 {
                   required: true,
-                  message: 'Team Logo is required',
+                  message: 'LineUp File is required',
                 },
               ]}
               shouldUpdate
@@ -282,7 +213,7 @@ const NewTeam = () => {
             </Form.Item>
           ) : (
             <Form.Array
-              name="teamLogo"
+              name="lineUpFile"
               renderAdd={() => (
                 <Button color="primary" fill="none">
                   <GoPlusCircle /> Add
@@ -319,10 +250,11 @@ const NewTeam = () => {
           )
         ) : null}
       </Form>
+    )
 
-      {user && teamId ? <Players teamId={teamId} /> : null}
-    </div>
+  return (
+    <Image className="rounded-2xl" src={match?.file[0]?.url} fit="contain" />
   )
 }
 
-export default NewTeam
+export default LineUp

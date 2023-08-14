@@ -1,4 +1,4 @@
-import { Dialog, Footer, List } from 'antd-mobile'
+import { Dialog, Footer, List, NavBar } from 'antd-mobile'
 import { useCallback, useState } from 'react'
 import useAuth from '../../hooks/useAuth'
 import { signOutFirebase, updateProfileFirebase } from '../../firebase/service'
@@ -34,6 +34,16 @@ const Profile = () => {
   }, [])
   return (
     <div>
+      <NavBar
+        className="sticky top-0 bg-bgPrimary"
+        style={{
+          '--height': '76px',
+        }}
+        backArrow={false}
+      >
+        Me
+      </NavBar>
+
       <List mode="card">
         <List.Item
           prefix={

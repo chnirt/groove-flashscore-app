@@ -1,4 +1,4 @@
-import { Button, Form, Input, NavBar, Toast } from 'antd-mobile'
+import { Button, Dialog, Form, Input, NavBar, Toast } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import { useCallback, useEffect, useState } from 'react'
@@ -35,7 +35,6 @@ const NewMatch = () => {
       try {
         Loading.get.show()
         const { playerName, jerseyNumber } = values
-        console.log(values)
         const uid = user.uid
         const playerData = {
           name: playerName,
@@ -55,7 +54,7 @@ const NewMatch = () => {
         navigate(-1)
         Toast.show({
           icon: 'success',
-          content: 'Player is added',
+          content: isEditMode ? 'Saved' : 'Added',
         })
 
         return
@@ -86,12 +85,19 @@ const NewMatch = () => {
   )
 
   const removePlayer = useCallback(async () => {
-    if (playerDocRefState === null) return
-    await deleteDoc(playerDocRefState)
-    navigate(-1)
-    Toast.show({
-      icon: 'success',
-      content: 'Player is deleted',
+    await Dialog.confirm({
+      content: 'Are you sure want to delete?',
+      cancelText: 'Cancel',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        if (playerDocRefState === null) return
+        await deleteDoc(playerDocRefState)
+        navigate(-1)
+        Toast.show({
+          icon: 'success',
+          content: 'Deleted',
+        })
+      },
     })
   }, [playerDocRefState, navigate])
 
@@ -112,6 +118,7 @@ const NewMatch = () => {
   return (
     <div>
       <NavBar
+        className="sticky top-0 bg-bgPrimary"
         style={{
           '--height': '76px',
         }}
@@ -142,7 +149,7 @@ const NewMatch = () => {
             size="large"
             shape="rounded"
           >
-            Add
+            {isEditMode ? 'Save' : 'Add'}
           </Button>
         }
       >
