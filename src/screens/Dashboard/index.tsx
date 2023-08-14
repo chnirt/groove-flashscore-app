@@ -44,12 +44,12 @@ const Dashboard = () => {
     )
     return result
   }, [filteredMatches])
-  const myMatchResult = useMemo(() => {
-    const result = filteredMatches?.filter((match) =>
-      moment(match.playDate.toDate()).isAfter(moment())
-    )
-    return result
-  }, [filteredMatches])
+  // const myMatchResult = useMemo(() => {
+  //   const result = filteredMatches?.filter((match) =>
+  //     moment(match.playDate.toDate()).isAfter(moment())
+  //   )
+  //   return result
+  // }, [filteredMatches])
 
   const navigateMatch = useCallback(
     (match: MatchType) => {

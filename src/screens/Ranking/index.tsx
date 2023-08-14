@@ -17,7 +17,7 @@ const Ranking = () => {
     [players]
   )
   const goalkeepers = useMemo(
-    () => players?.filter((player) => player?.goalkeeper),
+    () => players?.filter((player) => player?.goalkeeper) ?? [],
     [players]
   )
 
@@ -45,12 +45,18 @@ const Ranking = () => {
 
   const renderTabContent = useCallback(() => {
     switch (selectedIndex) {
-      case 0:
+      case 0: {
+        if (teams === undefined) return null
         return <TeamsRanking rows={teams} />
-      case 1:
+      }
+      case 1: {
+        if (goalscorers === undefined) return null
         return <PlayersRanking rows={goalscorers} />
-      case 2:
+      }
+      case 2: {
+        if (goalscorers === undefined) return null
         return <PlayersRanking rows={goalkeepers} />
+      }
       default:
         return null
     }

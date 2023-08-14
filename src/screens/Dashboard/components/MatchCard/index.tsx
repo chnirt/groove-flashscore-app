@@ -7,7 +7,6 @@ const MatchCard = ({
   className,
   match,
   onClick,
-  completed,
 }: LiveMatchCardProps) => {
   const { teams } = useFlashScore()
   if (teams?.length === 0) return null

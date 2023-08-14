@@ -1,6 +1,6 @@
 import Table from '../../../../components/Table'
 
-const Teams = ({ rows }: { rows?: any[] }) => {
+const Teams = ({ rows }: { rows: any[] }) => {
   const columns = [
     { field: 'rank', headerName: '' },
     { field: 'name', headerName: 'Name', className: 'w-full' },
