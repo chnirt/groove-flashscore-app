@@ -147,8 +147,10 @@ const NewMatch = () => {
         >
           <Select className="w-full" disabled={teams?.length === 0}>
             {teams?.length !== undefined && teams?.length > 0
-              ? teams.map((team) => (
-                  <Select.Option value={team.id}>{team.name}</Select.Option>
+              ? teams.map((team, ti: number) => (
+                  <Select.Option key={`home-team-${ti}`} value={team.id}>
+                    {team.name}
+                  </Select.Option>
                 ))
               : null}
           </Select>
@@ -174,8 +176,10 @@ const NewMatch = () => {
         >
           <Select className="w-full" disabled={teams?.length === 0}>
             {teams?.length !== undefined && teams?.length > 0
-              ? teams.map((team) => (
-                  <Select.Option value={team.id}>{team.name}</Select.Option>
+              ? teams.map((team, ti) => (
+                  <Select.Option key={`away-team-${ti}`} value={team.id}>
+                    {team.name}
+                  </Select.Option>
                 ))
               : null}
           </Select>

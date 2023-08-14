@@ -40,8 +40,8 @@ const LiveMatchCard = ({
     .valueOf()
   const timeDisplay =
     time > 90 ? "90+'" : time < 0 ? 'Updating' : `${Math.round(time)}'`
-  const homeScore = ' '
-  const awayScore = ' '
+  const homeScore = 0
+  const awayScore = 0
   return (
     <button
       className={twMerge(

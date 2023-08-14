@@ -169,8 +169,12 @@ const NewMatch = () => {
               message: 'Jersey Number is required',
             },
             {
-              pattern: /[0-9]{2}/,
+              pattern: /[0-9]/,
               message: 'Jersey Number must be number',
+            },
+            {
+              len: 2,
+              message: 'Jersey Number should be at least 4 characters',
             },
           ]}
           shouldUpdate

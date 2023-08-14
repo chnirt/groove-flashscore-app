@@ -68,7 +68,7 @@ const Match = () => {
 
         <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
           <div className="flex gap-4">
-            {['Stats', 'Line-up', 'Summary'].map((name: string, ti: number) => (
+            {['Stats', 'Line-up'].map((name: string, ti: number) => (
               <MatchButton
                 key={`tab-${ti}`}
                 team={{
