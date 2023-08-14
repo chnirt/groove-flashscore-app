@@ -16,6 +16,9 @@ type FlashScoreType = {
   matches?: any[]
   fetchMatch?: () => Promise<void>
   refetchMatch?: () => Promise<void>
+  players?: any[]
+  fetchPlayer?: () => Promise<void>
+  refetchPlayer?: () => Promise<void>
 }
 
 export const FlashScoreContext = createContext<FlashScoreType>({})
@@ -25,6 +28,7 @@ let querySnapshot
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   const [teams, setTeams] = useState<any[] | undefined>()
   const [matches, setMatches] = useState<any[] | undefined>()
+  const [players, setPlayers] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
     try {
@@ -34,6 +38,11 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const teamDocs = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        matches: 0,
+        win: 0,
+        draw: 0,
+        lose: 0,
+        points: 0,
       }))
       setTeams(teamDocs)
     } catch (error) {
@@ -62,9 +71,30 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [])
 
   const fetchMatch = useCallback(async () => {
-    if (teams?.length) return
+    if (matches?.length) return
     await refetchMatch()
-  }, [teams, refetchMatch])
+  }, [matches, refetchMatch])
+
+  const refetchPlayer = useCallback(async () => {
+    try {
+      const playerColGroupRef = getColRef('players')
+      const q = query(playerColGroupRef)
+      querySnapshot = await getDocs(q)
+      const playerDocs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        points: 0,
+      }))
+      setPlayers(playerDocs)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
+  const fetchPlayer = useCallback(async () => {
+    if (players?.length) return
+    await refetchPlayer()
+  }, [players, refetchPlayer])
 
   const value = useMemo(
     () => ({
@@ -74,8 +104,21 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       matches,
       fetchMatch,
       refetchMatch,
+      players,
+      fetchPlayer,
+      refetchPlayer,
     }),
-    [teams, fetchTeam, refetchTeam, matches, fetchMatch, refetchMatch]
+    [
+      teams,
+      fetchTeam,
+      refetchTeam,
+      matches,
+      fetchMatch,
+      refetchMatch,
+      players,
+      fetchPlayer,
+      refetchPlayer,
+    ]
   )
   return (
     <FlashScoreContext.Provider value={value}>

@@ -1,8 +1,14 @@
 import moment from 'moment'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 import { LiveMatchCardProps } from '../LiveMatchCard'
+import { twMerge } from 'tailwind-merge'
 
-const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
+const MatchCard = ({
+  className,
+  match,
+  onClick,
+  completed,
+}: LiveMatchCardProps) => {
   const { teams } = useFlashScore()
   if (teams?.length === 0) return null
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
@@ -12,12 +18,13 @@ const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0].url
   const time = moment(match.playDate.toDate()).format('HH:mm')
-  const date = moment(match.playDate.toDate())
-    .format('DD MMM')
-    .toUpperCase()
+  const date = moment(match.playDate.toDate()).format('DD MMM').toUpperCase()
   return (
     <button
-      className="flex min-h-[4rem] items-center justify-between gap-4 rounded-3xl bg-white px-6 py-4"
+      className={twMerge(
+        'flex min-h-[4rem] items-center justify-between gap-4 rounded-3xl bg-white px-6 py-4',
+        className
+      )}
       onClick={onClick}
     >
       <div className="flex flex-1 items-center justify-end gap-2">

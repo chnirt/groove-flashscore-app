@@ -49,7 +49,7 @@ const Match = () => {
       case 0:
         return [
           {
-            title: 'Shots',
+            title: 'Goals',
             // home: 2,
             // away: 6,
             home: 0,

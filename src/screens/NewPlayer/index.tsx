@@ -1,4 +1,4 @@
-import { Button, Dialog, Form, Input, NavBar, Toast } from 'antd-mobile'
+import { Button, Dialog, Form, Input, NavBar, Switch, Toast } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import { useCallback, useEffect, useState } from 'react'
@@ -34,11 +34,12 @@ const NewMatch = () => {
       if (teamId === undefined) return
       try {
         Loading.get.show()
-        const { playerName, jerseyNumber } = values
+        const { playerName, jerseyNumber, goalkeeper } = values
         const uid = user.uid
         const playerData = {
           name: playerName,
           jerseyNumber,
+          goalkeeper,
           teamId,
           uid,
         }
@@ -76,6 +77,7 @@ const NewMatch = () => {
       const playerDocRef = getDocRef('players', playerId)
       setPlayerDocRefState(playerDocRef)
       const playerDocData: any = await getDocument(playerDocRef)
+      console.log(playerDocData)
       form.setFieldsValue({
         ...playerDocData,
         playerName: playerDocData.name,
@@ -159,7 +161,6 @@ const NewMatch = () => {
           label="Player Name"
           rules={[
             {
-              required: true,
               message: 'Player Name is required',
             },
           ]}
@@ -172,7 +173,6 @@ const NewMatch = () => {
           label="Jersey Number"
           rules={[
             {
-              required: true,
               message: 'Jersey Number is required',
             },
             {
@@ -187,6 +187,15 @@ const NewMatch = () => {
           shouldUpdate
         >
           <Input autoComplete="none" placeholder="94" />
+        </Form.Item>
+
+        <Form.Item
+          name="goalkeeper"
+          label="Goalkeeper"
+          childElementPosition="right"
+          valuePropName="checked"
+        >
+          <Switch />
         </Form.Item>
       </Form>
 

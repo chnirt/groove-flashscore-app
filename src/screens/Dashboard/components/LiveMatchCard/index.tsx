@@ -16,6 +16,7 @@ export type LiveMatchCardProps = {
   match: MatchType
   selected?: boolean
   onClick?: () => void
+  completed?: boolean
 }
 
 const LiveMatchCard = ({

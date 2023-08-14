@@ -38,7 +38,13 @@ const Dashboard = () => {
     )
     return result
   }, [filteredMatches])
-  const myMatches = useMemo(() => {
+  const myUpcomingMatches = useMemo(() => {
+    const result = filteredMatches?.filter((match) =>
+      moment(match.playDate.toDate()).isAfter(moment())
+    )
+    return result
+  }, [filteredMatches])
+  const myMatchResult = useMemo(() => {
     const result = filteredMatches?.filter((match) =>
       moment(match.playDate.toDate()).isAfter(moment())
     )
@@ -165,7 +171,9 @@ const Dashboard = () => {
 
           <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-4">
-              <h2 className="m-0 text-lg font-bold text-gray1">Matches</h2>
+              <h2 className="m-0 text-lg font-bold text-gray1">
+                Upcoming Matches
+              </h2>
               {user ? (
                 <Link to={routes.newMatch}>
                   <button className="bg-transparent text-base font-medium text-secondary">
@@ -175,10 +183,10 @@ const Dashboard = () => {
               ) : null}
             </div>
             <div className="flex flex-col gap-4 px-4">
-              {myMatches?.length === undefined ? (
+              {myUpcomingMatches?.length === undefined ? (
                 <div>Loading</div>
-              ) : myMatches.length === 0 ? null : (
-                myMatches.map((match, mi: number) => (
+              ) : myUpcomingMatches.length === 0 ? null : (
+                myUpcomingMatches.map((match, mi: number) => (
                   <MatchCard
                     key={`match-${mi}`}
                     match={match}
@@ -188,6 +196,28 @@ const Dashboard = () => {
               )}
             </div>
           </div>
+
+          {/* <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between px-4">
+              <h2 className="m-0 text-lg font-bold text-gray1">
+                Match Results
+              </h2>
+            </div>
+            <div className="flex flex-col gap-4 px-4">
+              {myMatchResult?.length === undefined ? (
+                <div>Loading</div>
+              ) : myMatchResult.length === 0 ? null : (
+                myMatchResult.map((match, mi: number) => (
+                  <MatchCard
+                    key={`match-${mi}`}
+                    match={match}
+                    onClick={() => navigateMatch(match)}
+                    completed
+                  />
+                ))
+              )}
+            </div>
+          </div> */}
         </div>
       </PullToRefresh>
     </div>

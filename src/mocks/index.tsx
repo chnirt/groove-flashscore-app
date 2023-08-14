@@ -50,6 +50,7 @@ export const MASTER_MOCK_DATA = {
   NEW_PLAYER: {
     playerName: IS_DEVELOP ? 'Chnirt' : '',
     jerseyNumber: IS_DEVELOP ? '94' : '',
+    goalkeeper: false,
   },
   NEW_LINEUP: {
     uploadMethod: 'file',
