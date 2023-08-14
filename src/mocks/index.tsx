@@ -32,7 +32,7 @@ export const MASTER_MOCK_DATA = {
   },
   NEW_TEAM: {
     teamName: IS_DEVELOP ? 'Jupiter 1' : '',
-    uploadMethod: IS_DEVELOP ? 'link' : 'file',
+    uploadMethod: IS_DEVELOP ? 'file' : 'link',
     teamLogo: IS_DEVELOP
       ? [
           {

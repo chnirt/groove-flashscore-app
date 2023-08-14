@@ -92,28 +92,23 @@ const NewTeam = () => {
 
   const fetchTeamById = useCallback(
     async (teamId: string) => {
-      // if (user === null) return
-      // setLoading(true)
       const teamDocRef = getDocRef('teams', teamId)
       setTeamDocRefState(teamDocRef)
       const teamDocData: any = await getDocument(teamDocRef)
-      console.log(teamDocData)
       const uploadMethod = form.getFieldValue('uploadMethod')
       const isFile = uploadMethod === 'file'
-      console.log()
       form.setFieldsValue({
         ...teamDocData,
         teamName: teamDocData.name,
         teamLogo: isFile ? teamDocData.logo : teamDocData.logo[0].url,
       })
-      // setLoading(false)
     },
     [form]
   )
 
   useEffect(() => {
     if (teamId === undefined || typeof fetchTeamById !== 'function') return
-    const handleFetchMenu = async () => {
+    const handleFetchTeam = async () => {
       try {
         await fetchTeamById(teamId)
         // do something
@@ -122,7 +117,7 @@ const NewTeam = () => {
       }
     }
 
-    handleFetchMenu()
+    handleFetchTeam()
   }, [teamId, fetchTeamById, navigate])
 
   return (

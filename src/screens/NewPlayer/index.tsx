@@ -1,20 +1,32 @@
 import { Button, Form, Input, NavBar, Toast } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
-import { useCallback } from 'react'
-import { Timestamp } from 'firebase/firestore'
+import { useCallback, useEffect, useState } from 'react'
+import { DocumentData, DocumentReference, deleteDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { MASTER_MOCK_DATA } from '../../mocks'
-import { addDocument, getColRef } from '../../firebase/service'
+import {
+  addDocument,
+  getColRef,
+  getDocRef,
+  getDocument,
+  updateDocument,
+} from '../../firebase/service'
 import { Loading } from '../../global'
+import { routes } from '../../routes'
 
 const initialValues = MASTER_MOCK_DATA.NEW_PLAYER
 
 const NewMatch = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
-  const { teamId } = useParams()
+  const { teamId, playerId } = useParams()
+  const isEditMode = playerId
   const { user } = useAuth()
+  const [playerDocRefState, setPlayerDocRefState] = useState<DocumentReference<
+    DocumentData,
+    DocumentData
+  > | null>(null)
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
@@ -32,17 +44,13 @@ const NewMatch = () => {
           uid,
         }
 
-        // if (isEditMode) {
-        //   if (categoryDocRefState === null) return
-        //   await updateDocument(categoryDocRefState, categoryData)
-        // } else {
-        const playerDocRef = getColRef('players')
-        await addDocument(playerDocRef, playerData)
-        // }
-
-        // if (typeof refetchMatch === 'function') {
-        //   await refetchMatch()
-        // }
+        if (isEditMode) {
+          if (playerDocRefState === null) return
+          await updateDocument(playerDocRefState, playerData)
+        } else {
+          const playerDocRef = getColRef('players')
+          await addDocument(playerDocRef, playerData)
+        }
 
         navigate(-1)
         Toast.show({
@@ -61,8 +69,45 @@ const NewMatch = () => {
         Loading.get.hide()
       }
     },
-    [user, teamId, navigate]
+    [user, teamId, navigate, isEditMode, playerDocRefState]
   )
+
+  const fetchPlayerById = useCallback(
+    async (playerId: string) => {
+      const playerDocRef = getDocRef('players', playerId)
+      setPlayerDocRefState(playerDocRef)
+      const playerDocData: any = await getDocument(playerDocRef)
+      form.setFieldsValue({
+        ...playerDocData,
+        playerName: playerDocData.name,
+      })
+    },
+    [form]
+  )
+
+  const removePlayer = useCallback(async () => {
+    if (playerDocRefState === null) return
+    await deleteDoc(playerDocRefState)
+    navigate(-1)
+    Toast.show({
+      icon: 'success',
+      content: 'Player is deleted',
+    })
+  }, [playerDocRefState, navigate])
+
+  useEffect(() => {
+    if (playerId === undefined || typeof fetchPlayerById !== 'function') return
+    const handleFetchTeam = async () => {
+      try {
+        await fetchPlayerById(playerId)
+        // do something
+      } catch (e) {
+        navigate(routes.error)
+      }
+    }
+
+    handleFetchTeam()
+  }, [playerId, fetchPlayerById, navigate])
 
   return (
     <div>
@@ -133,6 +178,20 @@ const NewMatch = () => {
           <Input autoComplete="none" placeholder="94" />
         </Form.Item>
       </Form>
+
+      {user && isEditMode ? (
+        <Button
+          color="primary"
+          fill="none"
+          block
+          type="submit"
+          size="large"
+          shape="rounded"
+          onClick={removePlayer}
+        >
+          Remove
+        </Button>
+      ) : null}
     </div>
   )
 }

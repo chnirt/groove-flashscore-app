@@ -11,10 +11,11 @@ export const routes = {
 
   dashboard: '/',
   newTeam: '/newTeam',
-  editTeam: '/team/:teamId',
-  newPlayer: '/team/:teamId/newPlayer',
+  editTeam: '/teams/:teamId',
+  newPlayer: '/teams/:teamId/newPlayer',
+  editPlayer: '/teams/:teamId/players/:playerId',
   newMatch: '/newMatch',
-  match: '/match/:matchId',
+  match: '/matches/:matchId',
   rules: '/rules',
   ranking: '/ranking',
 
@@ -103,6 +104,16 @@ export const router = createBrowserRouter([
               },
               {
                 path: routes.newPlayer,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/NewPlayer'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.editPlayer,
                 element: (
                   <Loadable
                     {...{

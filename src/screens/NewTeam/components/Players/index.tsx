@@ -1,9 +1,9 @@
 import { Avatar, List } from 'antd-mobile'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router-dom'
+import { getDocs, query, where } from 'firebase/firestore'
 import { routes } from '../../../../routes'
 import { getColRef } from '../../../../firebase/service'
-import { getDocs, query, where } from 'firebase/firestore'
 
 let querySnapshot
 
@@ -22,8 +22,6 @@ const Players = ({ teamId }: { teamId: string }) => {
     setPlayers(playerDocs)
   }, [])
 
-  console.log(players)
-
   useEffect(() => {
     const handleFetchTeam = async () => {
       try {
@@ -41,8 +39,20 @@ const Players = ({ teamId }: { teamId: string }) => {
   if (players.length === 0) return <div>No data</div>
   return (
     <List header="Players" mode="card">
-      {players.map((player) => (
-        <List.Item prefix={<Avatar src="" />} description={player.jerseyNumber}>
+      {players.map((player, pi: number) => (
+        <List.Item
+          key={`player-${pi}`}
+          prefix={<Avatar src="" />}
+          description={player.jerseyNumber}
+          onClick={() =>
+            navigate(
+              generatePath(routes.editPlayer, {
+                teamId,
+                playerId: player.id,
+              })
+            )
+          }
+        >
           {player.name}
         </List.Item>
       ))}
