@@ -47,6 +47,10 @@ export const MASTER_MOCK_DATA = {
     awayTeamId: '',
     playDate: IS_DEVELOP ? new Date() : null,
   },
+  NEW_PLAYER: {
+    playerName: IS_DEVELOP ? 'Chnirt' : '',
+    jerseyNumber: IS_DEVELOP ? '94' : '',
+  },
 }
 
 export const TEAMS = [

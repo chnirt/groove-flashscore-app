@@ -1,4 +1,8 @@
-import { Avatar, NavBar, PullToRefresh } from 'antd-mobile'
+import {
+  // Avatar,
+  NavBar,
+  PullToRefresh,
+} from 'antd-mobile'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
 import moment from 'moment'
@@ -82,17 +86,17 @@ const Dashboard = () => {
         style={{
           '--height': '76px',
         }}
-        back={
-          user ? (
-            <Avatar
-              className="rounded-full border-2 border-white"
-              src="https://images.augustman.com/wp-content/uploads/sites/6/2023/06/29134648/iron-man-f.jpg"
-              style={{
-                '--size': '38px',
-              }}
-            />
-          ) : null
-        }
+        // back={
+        //   user ? (
+        //     <Avatar
+        //       className="rounded-full border-2 border-white"
+        //       src="https://images.augustman.com/wp-content/uploads/sites/6/2023/06/29134648/iron-man-f.jpg"
+        //       style={{
+        //         '--size': '38px',
+        //       }}
+        //     />
+        //   ) : null
+        // }
         backArrow={false}
         right={
           user ? (

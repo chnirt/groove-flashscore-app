@@ -10,7 +10,7 @@ import {
   Toast,
 } from 'antd-mobile'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import { Loading } from '../../global'
 import useAuth from '../../hooks/useAuth'
@@ -26,6 +26,7 @@ import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
 import { routes } from '../../routes'
 import { DocumentData, DocumentReference } from 'firebase/firestore'
+import Players from './components/Players'
 
 const initialValues = MASTER_MOCK_DATA.NEW_TEAM
 
@@ -139,6 +140,19 @@ const NewTeam = () => {
           </button>
         }
         backArrow={false}
+        right={
+          user && isEditMode ? (
+            <Link
+              to={generatePath(routes.newPlayer, {
+                teamId,
+              })}
+            >
+              <button className="bg-transparent text-base font-medium text-secondary">
+                New player
+              </button>
+            </Link>
+          ) : null
+        }
       >
         {isEditMode ? 'Edit Team' : 'New Team'}
       </NavBar>
@@ -309,6 +323,8 @@ const NewTeam = () => {
           )
         ) : null}
       </Form>
+
+      {user && teamId ? <Players teamId={teamId} /> : null}
     </div>
   )
 }
