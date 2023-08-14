@@ -5,5 +5,5 @@ export const eventNames = {
   REGISTER: "register",
 };
 
-export const IS_DEVELOP = true && import.meta.env.DEV;
+export const IS_DEVELOP = !true && import.meta.env.DEV;
 export const ORIGIN = window.location.origin;

@@ -11,7 +11,7 @@ const MatchCard = ({ match, onClick }: LiveMatchCardProps) => {
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0].url
-  const time = moment(match.playDate.toDate()).format('hh:mm')
+  const time = moment(match.playDate.toDate()).format('HH:mm')
   const date = moment(match.playDate.toDate())
     .format('DD MMM')
     .toUpperCase()

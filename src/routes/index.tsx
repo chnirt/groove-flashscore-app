@@ -11,6 +11,7 @@ export const routes = {
 
   dashboard: '/',
   newTeam: '/newTeam',
+  editTeam: '/team/:teamId',
   newMatch: '/newMatch',
   match: '/match/:matchId',
   rules: '/rules',
@@ -81,6 +82,16 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: routes.newTeam,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/NewTeam'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.editTeam,
                 element: (
                   <Loadable
                     {...{

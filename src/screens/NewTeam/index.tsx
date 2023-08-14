@@ -9,15 +9,23 @@ import {
   Space,
   Toast,
 } from 'antd-mobile'
-import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import { Loading } from '../../global'
 import useAuth from '../../hooks/useAuth'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
-import { addDocument, getColRef } from '../../firebase/service'
+import {
+  addDocument,
+  getColRef,
+  getDocRef,
+  getDocument,
+  updateDocument,
+} from '../../firebase/service'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
+import { routes } from '../../routes'
+import { DocumentData, DocumentReference } from 'firebase/firestore'
 
 const initialValues = MASTER_MOCK_DATA.NEW_TEAM
 
@@ -26,9 +34,15 @@ const maxCount = 1
 const NewTeam = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
+  const { teamId } = useParams()
+  const isEditMode = teamId
   const { user } = useAuth()
   const { refetchTeam } = useFlashScore()
   const uploadMethod = Form.useWatch('uploadMethod', form)
+  const [teamDocRefState, setTeamDocRefState] = useState<DocumentReference<
+    DocumentData,
+    DocumentData
+  > | null>(null)
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
@@ -44,13 +58,13 @@ const NewTeam = () => {
           uid,
         }
 
-        // if (isEditMode) {
-        //   if (categoryDocRefState === null) return
-        //   await updateDocument(categoryDocRefState, categoryData)
-        // } else {
-        const teamDocRef = getColRef('teams')
-        await addDocument(teamDocRef, teamData)
-        // }
+        if (isEditMode) {
+          if (teamDocRefState === null) return
+          await updateDocument(teamDocRefState, teamData)
+        } else {
+          const teamDocRef = getColRef('teams')
+          await addDocument(teamDocRef, teamData)
+        }
 
         if (typeof refetchTeam === 'function') {
           await refetchTeam()
@@ -72,8 +86,43 @@ const NewTeam = () => {
         Loading.get.hide()
       }
     },
-    [user, navigate, refetchTeam]
+    [user, navigate, refetchTeam, isEditMode, teamDocRefState]
   )
+
+  const fetchTeamById = useCallback(
+    async (teamId: string) => {
+      // if (user === null) return
+      // setLoading(true)
+      const teamDocRef = getDocRef('teams', teamId)
+      setTeamDocRefState(teamDocRef)
+      const teamDocData: any = await getDocument(teamDocRef)
+      console.log(teamDocData)
+      const uploadMethod = form.getFieldValue('uploadMethod')
+      const isFile = uploadMethod === 'file'
+      console.log()
+      form.setFieldsValue({
+        ...teamDocData,
+        teamName: teamDocData.name,
+        teamLogo: isFile ? teamDocData.logo : teamDocData.logo[0].url,
+      })
+      // setLoading(false)
+    },
+    [form]
+  )
+
+  useEffect(() => {
+    if (teamId === undefined || typeof fetchTeamById !== 'function') return
+    const handleFetchMenu = async () => {
+      try {
+        await fetchTeamById(teamId)
+        // do something
+      } catch (e) {
+        navigate(routes.error)
+      }
+    }
+
+    handleFetchMenu()
+  }, [teamId, fetchTeamById, navigate])
 
   return (
     <div>
@@ -91,7 +140,7 @@ const NewTeam = () => {
         }
         backArrow={false}
       >
-        New Team
+        {isEditMode ? 'Edit Team' : 'New Team'}
       </NavBar>
 
       <Form
@@ -163,7 +212,7 @@ const NewTeam = () => {
           <Form.Item
             name="teamLogo"
             label="Team Logo"
-            rules={[{ required: true, message: 'Dish Files is required' }]}
+            rules={[{ required: true, message: 'Team Logo is required' }]}
           >
             <ImageUploader
               upload={function (file: File): Promise<ImageUploadItem> {

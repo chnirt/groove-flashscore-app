@@ -23,6 +23,7 @@ const TeamButton = ({
   team,
   selected,
   onClick,
+  ...rest
 }: TeamButtonProps) => {
   return (
     <button
@@ -32,6 +33,7 @@ const TeamButton = ({
         className
       )}
       onClick={onClick}
+      {...rest}
     >
       {team?.logo ? (
         <img

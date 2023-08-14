@@ -124,7 +124,13 @@ const Dashboard = () => {
                   key={`team-${ti}`}
                   team={team}
                   selected={selectedIndex === ti}
-                  onClick={() => handleSelectTeam(ti)}
+                  onClick={() =>
+                    user
+                      ? navigate(
+                          generatePath(routes.editTeam, { teamId: team.id })
+                        )
+                      : handleSelectTeam(ti)
+                  }
                 />
               ))
             )}
