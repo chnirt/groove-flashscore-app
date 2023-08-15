@@ -51,6 +51,8 @@ export const MASTER_MOCK_DATA = {
     playerName: IS_DEVELOP ? 'Chnirt' : '',
     jerseyNumber: IS_DEVELOP ? '94' : '',
     goalkeeper: false,
+    uploadMethod: 'file',
+    playerAvatar: [],
   },
   NEW_LINEUP: {
     uploadMethod: 'file',

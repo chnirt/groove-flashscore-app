@@ -39,23 +39,26 @@ const Players = ({ teamId }: { teamId: string }) => {
   if (players.length === 0) return <div className="px-4">No data</div>
   return (
     <List header="Players" mode="card">
-      {players.map((player, pi: number) => (
-        <List.Item
-          key={`player-${pi}`}
-          prefix={<Avatar src="" />}
-          description={player.jerseyNumber}
-          onClick={() =>
-            navigate(
-              generatePath(routes.editPlayer, {
-                teamId,
-                playerId: player.id,
-              })
-            )
-          }
-        >
-          {player.name}
-        </List.Item>
-      ))}
+      {players.map((player, pi: number) => {
+        const avatar = player?.avatar?.[0]?.url ?? ''
+        return (
+          <List.Item
+            key={`player-${pi}`}
+            prefix={<Avatar src={avatar} />}
+            description={player.jerseyNumber}
+            onClick={() =>
+              navigate(
+                generatePath(routes.editPlayer, {
+                  teamId,
+                  playerId: player.id,
+                })
+              )
+            }
+          >
+            {player.name}
+          </List.Item>
+        )
+      })}
     </List>
   )
 }

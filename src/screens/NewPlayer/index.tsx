@@ -1,6 +1,18 @@
-import { Button, Dialog, Form, Input, NavBar, Switch, Toast } from 'antd-mobile'
+import {
+  Button,
+  Dialog,
+  Form,
+  ImageUploadItem,
+  ImageUploader,
+  Input,
+  NavBar,
+  Radio,
+  Space,
+  Switch,
+  Toast,
+} from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
-import { GoArrowLeft } from 'react-icons/go'
+import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
 import { useCallback, useEffect, useState } from 'react'
 import { DocumentData, DocumentReference, deleteDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
@@ -14,12 +26,16 @@ import {
 } from '../../firebase/service'
 import { Loading } from '../../global'
 import { routes } from '../../routes'
+import { uploadStorageBytesResumable } from '../../firebase/storage'
 
 const initialValues = MASTER_MOCK_DATA.NEW_PLAYER
+
+const maxCount = 1
 
 const NewMatch = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
+  const uploadMethod = Form.useWatch('uploadMethod', form)
   const { teamId, playerId } = useParams()
   const isEditMode = playerId
   const { user } = useAuth()
@@ -34,12 +50,16 @@ const NewMatch = () => {
       if (teamId === undefined) return
       try {
         Loading.get.show()
-        const { playerName, jerseyNumber, goalkeeper } = values
+        const { playerName, jerseyNumber, goalkeeper, playerAvatar } = values
         const uid = user.uid
+        const avatar = Array.isArray(playerAvatar)
+          ? playerAvatar
+          : [{ url: playerAvatar }]
         const playerData = {
           name: playerName,
           jerseyNumber,
           goalkeeper,
+          avatar,
           teamId,
           uid,
         }
@@ -77,10 +97,10 @@ const NewMatch = () => {
       const playerDocRef = getDocRef('players', playerId)
       setPlayerDocRefState(playerDocRef)
       const playerDocData: any = await getDocument(playerDocRef)
-      console.log(playerDocData)
       form.setFieldsValue({
         ...playerDocData,
         playerName: playerDocData.name,
+        playerAvatar: playerDocData.avatar,
       })
     },
     [form]
@@ -188,7 +208,6 @@ const NewMatch = () => {
         >
           <Input autoComplete="none" placeholder="94" />
         </Form.Item>
-
         <Form.Item
           name="goalkeeper"
           label="Goalkeeper"
@@ -197,6 +216,140 @@ const NewMatch = () => {
         >
           <Switch />
         </Form.Item>
+
+        <Form.Item name="uploadMethod" label="Upload Method">
+          <Radio.Group
+            onChange={(updateMethod) => {
+              if (maxCount === 1) {
+                if (updateMethod === 'file') {
+                  const file = form.getFieldValue('playerAvatar')
+                  if (typeof file !== 'string') return
+                  form.setFieldsValue({ playerAvatar: [{ url: file }] })
+                  return
+                }
+                if (updateMethod === 'link') {
+                  const file = form
+                    .getFieldValue('playerAvatar')
+                    .filter((teamFile: any) => Boolean(teamFile))
+                  if (!Array.isArray(file)) return
+                  form.setFieldsValue({ playerAvatar: file[0].url })
+                  return
+                }
+                return
+              }
+
+              const file = form
+                .getFieldValue('playerAvatar')
+                .filter((teamFile: any) => Boolean(teamFile))
+              form.setFieldsValue({ playerAvatar: file })
+            }}
+          >
+            <Space>
+              <Radio value="file">File</Radio>
+              <Radio value="link">Link</Radio>
+            </Space>
+          </Radio.Group>
+        </Form.Item>
+        {uploadMethod === 'file' && (
+          <Form.Item
+            name="playerAvatar"
+            label="Player Avatar"
+            rules={[{ required: true, message: 'Player Avatar is required' }]}
+          >
+            <ImageUploader
+              upload={function (file: File): Promise<ImageUploadItem> {
+                const isJpgOrPng =
+                  file.type === 'image/jpeg' || file.type === 'image/png'
+                if (!isJpgOrPng) {
+                  Toast.show({
+                    icon: 'error',
+                    content: 'You can only upload JPG/PNG file!',
+                  })
+                  return Promise.reject(
+                    new Error('You can only upload JPG/PNG file!')
+                  )
+                }
+                const isLt2M = file.size / 1024 / 1024 < 2
+                if (!isLt2M) {
+                  Toast.show({
+                    icon: 'error',
+                    content: 'Image must smaller than 2MB!',
+                  })
+                  return Promise.reject(
+                    new Error('Image must smaller than 2MB!')
+                  )
+                }
+
+                return new Promise((resolve, reject) => {
+                  uploadStorageBytesResumable(
+                    file,
+                    undefined,
+                    (error) => reject(error),
+                    async ({ downloadURL }) =>
+                      resolve({
+                        url: downloadURL,
+                      })
+                  )
+                })
+              }}
+              multiple
+              maxCount={maxCount}
+            />
+          </Form.Item>
+        )}
+        {uploadMethod === 'link' ? (
+          maxCount === 1 ? (
+            <Form.Item
+              name="playerAvatar"
+              label="Player Avatar"
+              rules={[
+                {
+                  required: true,
+                  message: 'Player Avatar is required',
+                },
+              ]}
+              shouldUpdate
+            >
+              <Input autoComplete="none" placeholder="https://example.com" />
+            </Form.Item>
+          ) : (
+            <Form.Array
+              name="playerAvatar"
+              renderAdd={() => (
+                <Button color="primary" fill="none">
+                  <GoPlusCircle /> Add
+                </Button>
+              )}
+              renderHeader={({ index }, { remove }) => (
+                <div className="flex items-center justify-between">
+                  <span>Link {index + 1}</span>
+                  <Button
+                    onClick={() => remove(index)}
+                    style={{ float: 'right' }}
+                    color="primary"
+                    fill="none"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
+            >
+              {(fields) =>
+                fields.map(({ index }) => (
+                  <>
+                    <Form.Item
+                      name={[index, 'url']}
+                      label="Link"
+                      rules={[{ required: true, message: 'Link is required' }]}
+                    >
+                      <Input placeholder="https://example.com" />
+                    </Form.Item>
+                  </>
+                ))
+              }
+            </Form.Array>
+          )
+        ) : null}
       </Form>
 
       {user && isEditMode ? (

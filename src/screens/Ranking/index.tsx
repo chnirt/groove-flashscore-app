@@ -78,6 +78,7 @@ const Ranking = () => {
             {['POINTS TABLE', 'TOP GOAL SCORERS', 'TOP GOALKEEPERS'].map(
               (name: string, ti: number) => (
                 <MatchButton
+                  className="h-full"
                   key={`tab-${ti}`}
                   team={{
                     name,
