@@ -25,7 +25,7 @@ const Home = () => {
     scrollToTop()
   }, [location, scrollToTop])
   return (
-    <div className="bg-bgPrimary">
+    <div className="bg-black1">
       <Outlet context={auth} />
     </div>
   )

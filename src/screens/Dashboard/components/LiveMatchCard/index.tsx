@@ -1,6 +1,7 @@
 import { twMerge } from 'tailwind-merge'
 import moment from 'moment'
 import { Timestamp } from 'firebase/firestore'
+import { Image } from 'antd-mobile'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 
 export type MatchType = {
@@ -67,10 +68,11 @@ const LiveMatchCard = ({
         <div className="flex justify-between">
           <div className="flex flex-1 flex-col items-center justify-center gap-1">
             {homeTeamLogo ? (
-              <img
-                className="h-14 w-14 object-contain"
+              <Image
+                className="h-14 w-14"
                 src={homeTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
+                fit="contain"
               />
             ) : null}
             <p
@@ -110,10 +112,11 @@ const LiveMatchCard = ({
           </div>
           <div className="flex flex-1 flex-col items-center justify-center gap-1">
             {awayTeamLogo ? (
-              <img
-                className="h-14 w-14 object-contain"
+              <Image
+                className="h-14 w-14"
                 src={awayTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
+                fit="contain"
               />
             ) : null}
             <p
