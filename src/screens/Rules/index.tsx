@@ -65,10 +65,10 @@ const Rules = () => {
         Rules
       </NavBar>
       <div className="px-4">
-        {user ? (
+        {!user ? (
           <SimpleMDE value={value} onChange={setValue} />
         ) : (
-          <ReactMarkdown children={markdown} />
+          <ReactMarkdown children={value} />
         )}
         {user ? (
           <Button

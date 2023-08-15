@@ -7,7 +7,6 @@ import {
   Radio,
   Space,
   Toast,
-  Image,
 } from 'antd-mobile'
 import { useCallback, useEffect } from 'react'
 import { DocumentData, DocumentReference } from 'firebase/firestore'
@@ -253,7 +252,7 @@ const LineUp = ({
     )
 
   return (
-    <Image className="rounded-2xl" src={match?.file[0]?.url} fit="contain" />
+    <img className="rounded-2xl object-contain" src={match?.file[0]?.url} />
   )
 }
 

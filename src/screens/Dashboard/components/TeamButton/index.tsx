@@ -1,4 +1,3 @@
-import { Image } from 'antd-mobile'
 import { twMerge } from 'tailwind-merge'
 
 type Logo = {
@@ -37,11 +36,10 @@ const TeamButton = ({
       {...rest}
     >
       {team?.logo ? (
-        <Image
-          className="mr-2 h-6 w-6"
+        <img
+          className="mr-2 h-6 w-6 object-contain"
           src={team.logo[0]?.url}
           alt={`logo-${team.logo}`}
-          fit="contain"
         />
       ) : null}
       <p className={twMerge('m-0 text-base font-semibold', fontClassName)}>
