@@ -5,28 +5,31 @@ import { Button, NavBar, Toast } from 'antd-mobile'
 import 'easymde/dist/easymde.min.css'
 import useAuth from '../../hooks/useAuth'
 import { Loading } from '../../global'
-import { getDocRef, updateDocument } from '../../firebase/service'
+import { getDocRef, getDocument, updateDocument } from '../../firebase/service'
+import { routes } from '../../routes'
+import { useNavigate } from 'react-router-dom'
 
-const markdown = `
-04 clubs will compete in a round-robin format to calculate the scores. After the group stage, the clubs ranked first and second will play
-in the final match, while the teams ranked third and fourth will compete in the third-place playoff.
-- Each team must have 8 - 12 players.
-- Players within a team must be members of the same BU (excepted Mars & Venus).
-- Any changes to the players in the team compared to the registered list must be submitted to and confirmed by the organizing committee.
-- The team must prepare their uniforms and register with the organizers at least 5 days before the tournament takes place. All players'
-uniforms must have a jersey number, and the players' jersey numbers cannot be changed throughout their participation in the competition
-- In all cases, the decision of the organizing committee is final
-`
+// const markdown = `
+// 04 clubs will compete in a round-robin format to calculate the scores. After the group stage, the clubs ranked first and second will play
+// in the final match, while the teams ranked third and fourth will compete in the third-place playoff.
+// - Each team must have 8 - 12 players.
+// - Players within a team must be members of the same BU (excepted Mars & Venus).
+// - Any changes to the players in the team compared to the registered list must be submitted to and confirmed by the organizing committee.
+// - The team must prepare their uniforms and register with the organizers at least 5 days before the tournament takes place. All players'
+// uniforms must have a jersey number, and the players' jersey numbers cannot be changed throughout their participation in the competition
+// - In all cases, the decision of the organizing committee is final
+// `
+
+const uid = 'YmkaDMxsc5cctaWNJvE3uqunXig2'
 
 const Rules = () => {
   const { user } = useAuth()
-  const [value, setValue] = useState(markdown)
+  const navigate = useNavigate()
+  const [value, setValue] = useState()
 
   const handleSubmit = useCallback(async () => {
-    if (user === null) return
     try {
       Loading.get.show()
-      const uid = user.uid
       const settingsData = {
         ...(value ? { rules: value } : {}),
       }
@@ -46,12 +49,27 @@ const Rules = () => {
     } finally {
       Loading.get.hide()
     }
-  }, [user, value])
+  }, [value])
+
+  const fetchRules = useCallback(async () => {
+    const userDocRef = getDocRef('users', uid)
+    const userDocData: any = await getDocument(userDocRef)
+    setValue(userDocData.rules)
+  }, [])
 
   useEffect(() => {
-    if (user?.rules === undefined) return
-    setValue(user.rules)
-  }, [user])
+    if (typeof fetchRules !== 'function') return
+    const handleFetchRules = async () => {
+      try {
+        await fetchRules()
+        // do something
+      } catch (e) {
+        navigate(routes.error)
+      }
+    }
+
+    handleFetchRules()
+  }, [fetchRules, navigate])
 
   return (
     <div>
@@ -65,8 +83,10 @@ const Rules = () => {
         Rules
       </NavBar>
       <div className="px-4">
-        {!user ? (
+        {user ? (
           <SimpleMDE value={value} onChange={setValue} />
+        ) : value === undefined ? (
+          <div>Loading</div>
         ) : (
           <ReactMarkdown children={value} />
         )}

@@ -115,7 +115,7 @@ const Dashboard = () => {
         }
       >
         <button className="bg-transparent">
-          <p className="text-lg text-black2">Groove FlashScore</p>
+          <p className="text-lg text-black2">GROOVE LEAGUE 2023</p>
         </button>
       </NavBar>
 
