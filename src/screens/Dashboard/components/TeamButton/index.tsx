@@ -40,6 +40,7 @@ const TeamButton = ({
           className="mr-2 h-6 w-6 object-contain"
           src={team.logo[0]?.url}
           alt={`logo-${team.logo}`}
+          loading="lazy"
         />
       ) : null}
       <p className={twMerge('m-0 text-base font-semibold', fontClassName)}>

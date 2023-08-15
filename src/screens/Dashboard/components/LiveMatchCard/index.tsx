@@ -71,11 +71,12 @@ const LiveMatchCard = ({
                 className="h-14 w-14"
                 src={homeTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
+                loading="lazy"
               />
             ) : null}
             <p
               className={twMerge(
-                'm-0 line-clamp-1 text-right text-sm font-normal text-black2',
+                'm-0 text-sm font-normal text-black2',
                 selected && 'text-white'
               )}
             >
@@ -114,11 +115,12 @@ const LiveMatchCard = ({
                 className="h-14 w-14 object-contain"
                 src={awayTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
+                loading="lazy"
               />
             ) : null}
             <p
               className={twMerge(
-                'm-0 line-clamp-1 text-left text-sm font-normal text-black2',
+                'm-0 text-sm font-normal text-black2',
                 selected && 'text-white'
               )}
             >

@@ -34,13 +34,7 @@ const Profile = () => {
   }, [])
   return (
     <div>
-      <NavBar
-        className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
-        backArrow={false}
-      >
+      <NavBar className="sticky top-0 z-10 bg-bgPrimary" backArrow={false}>
         Me
       </NavBar>
 

@@ -33,6 +33,7 @@ const MatchCard = ({
             className="h-8 w-8 object-contain"
             src={homeTeamLogo}
             alt={`logo-${homeTeamLogo}`}
+            loading="lazy"
           />
         ) : null}
       </div>
@@ -48,6 +49,7 @@ const MatchCard = ({
             className="h-8 w-8 object-contain"
             src={awayTeamLogo}
             alt={`logo-${awayTeamLogo}`}
+            loading="lazy"
           />
         ) : null}
         <p className="m-0 text-left text-base font-semibold text-black2">

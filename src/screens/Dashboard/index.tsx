@@ -2,6 +2,7 @@ import {
   // Avatar,
   NavBar,
   PullToRefresh,
+  Skeleton,
 } from 'antd-mobile'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
@@ -88,10 +89,7 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col">
       <NavBar
-        className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
+        className="sticky top-0 z-10 bg-bgPrimary"
         // back={
         //   user ? (
         //     <Avatar
@@ -121,15 +119,15 @@ const Dashboard = () => {
 
       <PullToRefresh onRefresh={onRefresh}>
         <div className="my-4 flex flex-col gap-8">
-          <div className="no-scrollbar flex gap-5 overflow-x-scroll px-4">
-            {teams?.length === undefined ? (
-              <div>Loading</div> ? (
-                teams?.length === 0
-              ) : (
-                <div>No data</div>
-              )
-            ) : (
-              formattedTeams.map((team, ti: number) => (
+          {teams === undefined ? (
+            <div className="flex flex-row gap-5 px-4">
+              <Skeleton animated className="h-12 w-14 rounded-3xl" />
+              <Skeleton animated className="h-12 w-40 rounded-3xl" />
+              <Skeleton animated className="h-12 w-40 rounded-3xl" />
+            </div>
+          ) : teams?.length === 0 ? null : (
+            <div className="no-scrollbar flex gap-5 overflow-x-scroll px-4">
+              {formattedTeams.map((team, ti: number) => (
                 <TeamButton
                   key={`team-${ti}`}
                   team={team}
@@ -142,12 +140,19 @@ const Dashboard = () => {
                       : handleSelectTeam(ti)
                   }
                 />
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {myLiveMatches?.length === undefined ? (
-            <div className="px-4">Loading</div>
+          {myLiveMatches === undefined ? (
+            <div className="flex flex-col gap-7">
+              <div className="px-4">
+                <Skeleton.Title className="!mb-0 !mt-0 h-7" />
+              </div>
+              <div className="flex flex-row gap-5 px-4">
+                <Skeleton animated className="h-[13rem] w-72 rounded-3xl" />
+              </div>
+            </div>
           ) : myLiveMatches.length === 0 ? null : (
             <div className="flex flex-col gap-7">
               <div className="px-4">
@@ -169,33 +174,43 @@ const Dashboard = () => {
             </div>
           )}
 
-          <div className="flex flex-col gap-8">
-            <div className="flex items-center justify-between px-4">
-              <h2 className="m-0 text-lg font-bold text-gray1">
-                Upcoming Matches
-              </h2>
-              {user ? (
-                <Link to={routes.newMatch}>
-                  <button className="bg-transparent text-base font-medium text-secondary">
-                    New match
-                  </button>
-                </Link>
-              ) : null}
+          {myUpcomingMatches === undefined ? (
+            <div className="flex flex-col gap-8">
+              <div className="px-4">
+                <Skeleton.Title className="!mb-0 !mt-0 h-7" />
+              </div>
+              <div className="flex flex-col gap-4 px-4">
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+              </div>
             </div>
-            <div className="flex flex-col gap-4 px-4">
-              {myUpcomingMatches?.length === undefined ? (
-                <div>Loading</div>
-              ) : myUpcomingMatches.length === 0 ? null : (
-                myUpcomingMatches.map((match, mi: number) => (
+          ) : myUpcomingMatches.length === 0 ? null : (
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between px-4">
+                <h2 className="m-0 text-lg font-bold text-gray1">
+                  Upcoming Matches
+                </h2>
+                {user ? (
+                  <Link to={routes.newMatch}>
+                    <button className="bg-transparent text-base font-medium text-secondary">
+                      New match
+                    </button>
+                  </Link>
+                ) : null}
+              </div>
+              <div className="flex flex-col gap-4 px-4">
+                {myUpcomingMatches.map((match, mi: number) => (
                   <MatchCard
                     key={`match-${mi}`}
                     match={match}
                     onClick={() => navigateMatch(match)}
                   />
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-4">

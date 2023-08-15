@@ -1,4 +1,4 @@
-import { NavBar } from 'antd-mobile'
+import { NavBar, Skeleton } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
@@ -80,9 +80,7 @@ const Match = () => {
   return (
     <div className="flex flex-col">
       <NavBar
-        style={{
-          '--height': '76px',
-        }}
+        className="sticky top-0 z-10 bg-bgPrimary"
         back={
           <button
             className="h-10 w-10 rounded-2xl bg-white p-2"
@@ -100,11 +98,19 @@ const Match = () => {
           ) : null
         }
       >
-        {match?.groupStage ? match.groupStage : <div>Loading</div>}
+        {match?.groupStage ? (
+          match.groupStage
+        ) : (
+          <Skeleton.Title className="!mb-0 !mt-0 h-7" />
+        )}
       </NavBar>
 
       <div className="flex flex-col gap-8 p-4">
-        {match ? <LiveMatchCard match={match} /> : <div>Loading</div>}
+        {match ? (
+          <LiveMatchCard match={match} />
+        ) : (
+          <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
+        )}
 
         <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
           <div className="flex gap-4">

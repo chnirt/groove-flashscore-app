@@ -121,12 +121,9 @@ const NewTeam = () => {
   }, [teamId, fetchTeamById, navigate])
 
   return (
-    <div>
+    <div className="flex flex-col">
       <NavBar
-        className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
+        className="sticky top-0 z-10 bg-bgPrimary"
         back={
           <button
             className="h-10 w-10 rounded-2xl bg-white p-2"
@@ -153,174 +150,178 @@ const NewTeam = () => {
         {isEditMode ? 'Edit Team' : 'New Team'}
       </NavBar>
 
-      <Form
-        form={form}
-        initialValues={initialValues}
-        layout="horizontal"
-        onFinish={onFinish}
-        mode="card"
-        footer={
-          <Button
-            block
-            type="submit"
-            color="primary"
-            size="large"
-            shape="rounded"
-          >
-            {isEditMode ? 'Save' : 'Add'}
-          </Button>
-        }
-      >
-        <Form.Header>New Team</Form.Header>
-        <Form.Item
-          name="teamName"
-          label="Team Name"
-          rules={[
-            {
-              required: true,
-              message: 'Team Name is required',
-            },
-          ]}
-          shouldUpdate
+      <div>
+        <Form
+          form={form}
+          initialValues={initialValues}
+          layout="horizontal"
+          onFinish={onFinish}
+          mode="card"
+          footer={
+            <Button
+              block
+              type="submit"
+              color="primary"
+              size="large"
+              shape="rounded"
+            >
+              {isEditMode ? 'Save' : 'Add'}
+            </Button>
+          }
         >
-          <Input autoComplete="none" placeholder="Jupiter" />
-        </Form.Item>
-        <Form.Item name="uploadMethod" label="Upload Method">
-          <Radio.Group
-            onChange={(updateMethod) => {
-              if (maxCount === 1) {
-                if (updateMethod === 'file') {
-                  const teamLogo = form.getFieldValue('teamLogo')
-                  if (typeof teamLogo !== 'string') return
-                  form.setFieldsValue({ teamLogo: [{ url: teamLogo }] })
-                  return
-                }
-                if (updateMethod === 'link') {
-                  const teamLogo = form
-                    .getFieldValue('teamLogo')
-                    .filter((teamFile: any) => Boolean(teamFile))
-                  if (!Array.isArray(teamLogo)) return
-                  form.setFieldsValue({ teamLogo: teamLogo[0].url })
-                  return
-                }
-                return
-              }
-
-              const teamLogo = form
-                .getFieldValue('teamLogo')
-                .filter((teamFile: any) => Boolean(teamFile))
-              form.setFieldsValue({ teamLogo })
-            }}
-          >
-            <Space>
-              <Radio value="file">File</Radio>
-              <Radio value="link">Link</Radio>
-            </Space>
-          </Radio.Group>
-        </Form.Item>
-        {uploadMethod === 'file' && (
+          <Form.Header>New Team</Form.Header>
           <Form.Item
-            name="teamLogo"
-            label="Team Logo"
-            rules={[{ required: true, message: 'Team Logo is required' }]}
+            name="teamName"
+            label="Team Name"
+            rules={[
+              {
+                required: true,
+                message: 'Team Name is required',
+              },
+            ]}
+            shouldUpdate
           >
-            <ImageUploader
-              upload={function (file: File): Promise<ImageUploadItem> {
-                const isJpgOrPng =
-                  file.type === 'image/jpeg' || file.type === 'image/png'
-                if (!isJpgOrPng) {
-                  Toast.show({
-                    icon: 'error',
-                    content: 'You can only upload JPG/PNG file!',
-                  })
-                  return Promise.reject(
-                    new Error('You can only upload JPG/PNG file!')
-                  )
-                }
-                const isLt2M = file.size / 1024 / 1024 < 2
-                if (!isLt2M) {
-                  Toast.show({
-                    icon: 'error',
-                    content: 'Image must smaller than 2MB!',
-                  })
-                  return Promise.reject(
-                    new Error('Image must smaller than 2MB!')
-                  )
+            <Input autoComplete="none" placeholder="Jupiter" />
+          </Form.Item>
+          <Form.Item name="uploadMethod" label="Upload Method">
+            <Radio.Group
+              onChange={(updateMethod) => {
+                if (maxCount === 1) {
+                  if (updateMethod === 'file') {
+                    const teamLogo = form.getFieldValue('teamLogo')
+                    if (typeof teamLogo !== 'string') return
+                    form.setFieldsValue({ teamLogo: [{ url: teamLogo }] })
+                    return
+                  }
+                  if (updateMethod === 'link') {
+                    const teamLogo = form
+                      .getFieldValue('teamLogo')
+                      .filter((teamFile: any) => Boolean(teamFile))
+                    if (!Array.isArray(teamLogo)) return
+                    form.setFieldsValue({ teamLogo: teamLogo[0].url })
+                    return
+                  }
+                  return
                 }
 
-                return new Promise((resolve, reject) => {
-                  uploadStorageBytesResumable(
-                    file,
-                    undefined,
-                    (error) => reject(error),
-                    async ({ downloadURL }) =>
-                      resolve({
-                        url: downloadURL,
-                      })
-                  )
-                })
+                const teamLogo = form
+                  .getFieldValue('teamLogo')
+                  .filter((teamFile: any) => Boolean(teamFile))
+                form.setFieldsValue({ teamLogo })
               }}
-              multiple
-              maxCount={maxCount}
-            />
+            >
+              <Space>
+                <Radio value="file">File</Radio>
+                <Radio value="link">Link</Radio>
+              </Space>
+            </Radio.Group>
           </Form.Item>
-        )}
-        {uploadMethod === 'link' ? (
-          maxCount === 1 ? (
+          {uploadMethod === 'file' && (
             <Form.Item
               name="teamLogo"
               label="Team Logo"
-              rules={[
-                {
-                  required: true,
-                  message: 'Team Logo is required',
-                },
-              ]}
-              shouldUpdate
+              rules={[{ required: true, message: 'Team Logo is required' }]}
             >
-              <Input autoComplete="none" placeholder="https://example.com" />
-            </Form.Item>
-          ) : (
-            <Form.Array
-              name="teamLogo"
-              renderAdd={() => (
-                <Button color="primary" fill="none">
-                  <GoPlusCircle /> Add
-                </Button>
-              )}
-              renderHeader={({ index }, { remove }) => (
-                <div className="flex items-center justify-between">
-                  <span>Link {index + 1}</span>
-                  <Button
-                    onClick={() => remove(index)}
-                    style={{ float: 'right' }}
-                    color="primary"
-                    fill="none"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              )}
-            >
-              {(fields) =>
-                fields.map(({ index }) => (
-                  <>
-                    <Form.Item
-                      name={[index, 'url']}
-                      label="Link"
-                      rules={[{ required: true, message: 'Link is required' }]}
-                    >
-                      <Input placeholder="https://example.com" />
-                    </Form.Item>
-                  </>
-                ))
-              }
-            </Form.Array>
-          )
-        ) : null}
-      </Form>
+              <ImageUploader
+                upload={function (file: File): Promise<ImageUploadItem> {
+                  const isJpgOrPng =
+                    file.type === 'image/jpeg' || file.type === 'image/png'
+                  if (!isJpgOrPng) {
+                    Toast.show({
+                      icon: 'error',
+                      content: 'You can only upload JPG/PNG file!',
+                    })
+                    return Promise.reject(
+                      new Error('You can only upload JPG/PNG file!')
+                    )
+                  }
+                  const isLt2M = file.size / 1024 / 1024 < 2
+                  if (!isLt2M) {
+                    Toast.show({
+                      icon: 'error',
+                      content: 'Image must smaller than 2MB!',
+                    })
+                    return Promise.reject(
+                      new Error('Image must smaller than 2MB!')
+                    )
+                  }
 
-      {user && teamId ? <Players teamId={teamId} /> : null}
+                  return new Promise((resolve, reject) => {
+                    uploadStorageBytesResumable(
+                      file,
+                      undefined,
+                      (error) => reject(error),
+                      async ({ downloadURL }) =>
+                        resolve({
+                          url: downloadURL,
+                        })
+                    )
+                  })
+                }}
+                multiple
+                maxCount={maxCount}
+              />
+            </Form.Item>
+          )}
+          {uploadMethod === 'link' ? (
+            maxCount === 1 ? (
+              <Form.Item
+                name="teamLogo"
+                label="Team Logo"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Team Logo is required',
+                  },
+                ]}
+                shouldUpdate
+              >
+                <Input autoComplete="none" placeholder="https://example.com" />
+              </Form.Item>
+            ) : (
+              <Form.Array
+                name="teamLogo"
+                renderAdd={() => (
+                  <Button color="primary" fill="none">
+                    <GoPlusCircle /> Add
+                  </Button>
+                )}
+                renderHeader={({ index }, { remove }) => (
+                  <div className="flex items-center justify-between">
+                    <span>Link {index + 1}</span>
+                    <Button
+                      onClick={() => remove(index)}
+                      style={{ float: 'right' }}
+                      color="primary"
+                      fill="none"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                )}
+              >
+                {(fields) =>
+                  fields.map(({ index }) => (
+                    <>
+                      <Form.Item
+                        name={[index, 'url']}
+                        label="Link"
+                        rules={[
+                          { required: true, message: 'Link is required' },
+                        ]}
+                      >
+                        <Input placeholder="https://example.com" />
+                      </Form.Item>
+                    </>
+                  ))
+                }
+              </Form.Array>
+            )
+          ) : null}
+        </Form>
+
+        {user && teamId ? <Players teamId={teamId} /> : null}
+      </div>
     </div>
   )
 }

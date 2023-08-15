@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import SimpleMDE from 'react-simplemde-editor'
-import { Button, NavBar, Toast } from 'antd-mobile'
+import { Button, NavBar, Skeleton, Toast } from 'antd-mobile'
 import 'easymde/dist/easymde.min.css'
 import useAuth from '../../hooks/useAuth'
 import { Loading } from '../../global'
@@ -73,20 +73,14 @@ const Rules = () => {
 
   return (
     <div>
-      <NavBar
-        className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
-        backArrow={false}
-      >
+      <NavBar className="sticky top-0 z-10 bg-bgPrimary" backArrow={false}>
         Rules
       </NavBar>
       <div className="px-4">
         {user ? (
           <SimpleMDE value={value} onChange={setValue} />
         ) : value === undefined ? (
-          <div>Loading</div>
+            <Skeleton animated className="h-screen w-full rounded-3xl" />
         ) : (
           <ReactMarkdown children={value} />
         )}

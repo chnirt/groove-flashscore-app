@@ -74,9 +74,6 @@ const NewMatch = () => {
     <div>
       <NavBar
         className="sticky top-0 bg-bgPrimary"
-        style={{
-          '--height': '76px',
-        }}
         back={
           <button
             className="h-10 w-10 rounded-2xl bg-white p-2"

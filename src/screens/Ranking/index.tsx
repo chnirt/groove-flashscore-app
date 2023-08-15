@@ -1,4 +1,4 @@
-import { NavBar, PullToRefresh } from 'antd-mobile'
+import { NavBar, PullToRefresh, Skeleton } from 'antd-mobile'
 import TeamsRanking from './components/TeamsRanking'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -46,15 +46,18 @@ const Ranking = () => {
   const renderTabContent = useCallback(() => {
     switch (selectedIndex) {
       case 0: {
-        if (teams === undefined) return null
+        if (teams === undefined)
+          return <Skeleton animated className="h-screen w-full rounded-3xl" />
         return <TeamsRanking rows={teams} />
       }
       case 1: {
-        if (goalscorers === undefined) return null
+        if (goalscorers === undefined)
+          return <Skeleton animated className="h-screen w-full rounded-3xl" />
         return <PlayersRanking rows={goalscorers} />
       }
       case 2: {
-        if (goalscorers === undefined) return null
+        if (goalscorers === undefined)
+          return <Skeleton animated className="h-screen w-full rounded-3xl" />
         return <PlayersRanking rows={goalkeepers} />
       }
       default:
@@ -64,12 +67,7 @@ const Ranking = () => {
 
   return (
     <div>
-      <NavBar
-        style={{
-          '--height': '76px',
-        }}
-        backArrow={false}
-      >
+      <NavBar className="sticky top-0 z-10 bg-bgPrimary" backArrow={false}>
         Ranking
       </NavBar>
       <PullToRefresh onRefresh={onRefresh}>

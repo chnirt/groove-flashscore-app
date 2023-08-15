@@ -66,7 +66,7 @@ const LineUp = ({
         Loading.get.hide()
       }
     },
-    [user, navigate, matchDocRefState]
+    [user, matchDocRefState]
   )
 
   const fetchLineUpById = useCallback(
