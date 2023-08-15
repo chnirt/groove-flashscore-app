@@ -25,7 +25,7 @@ const uid = 'YmkaDMxsc5cctaWNJvE3uqunXig2'
 const Rules = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [value, setValue] = useState()
+  const [value, setValue] = useState<string>()
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -80,7 +80,7 @@ const Rules = () => {
         {user ? (
           <SimpleMDE value={value} onChange={setValue} />
         ) : value === undefined ? (
-            <Skeleton animated className="h-screen w-full rounded-3xl" />
+          <Skeleton animated className="h-screen w-full rounded-3xl" />
         ) : (
           <ReactMarkdown children={value} />
         )}
