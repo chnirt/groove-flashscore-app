@@ -1,5 +1,4 @@
 import { ReactNode } from 'react'
-import { twMerge } from 'tailwind-merge'
 
 type Column = {
   field: string
@@ -17,12 +16,14 @@ type TableProps = {
 
 const Table = ({ columns, rows }: TableProps) => {
   return (
-    <table className="table-auto">
+    <table className="table-fixed">
       <thead>
         <tr>
           {columns.length > 0
             ? columns.map((column, ci: number) => (
-                <th key={`column-${ci}`}>{column.headerName}</th>
+                <th key={`column-${ci}`} className={column.className}>
+                  {column.headerName}
+                </th>
               ))
             : null}
         </tr>
@@ -48,15 +49,11 @@ const Table = ({ columns, rows }: TableProps) => {
                         const column = columns.find(
                           (column) => column.field === fieldKey
                         )
-                        const className = column?.className
                         const renderCell = column?.renderCell
                         const IsFunction = typeof renderCell === 'function'
                         return (
                           <td
-                            className={twMerge(
-                              'whitespace-nowrap p-3 text-left',
-                              className
-                            )}
+                            className={'whitespace-nowrap p-3 text-left'}
                             key={`field-value-${fvi}`}
                           >
                             {IsFunction

@@ -57,7 +57,7 @@ const Profile = () => {
           Log out
         </List.Item>
         <List.Item arrow={false}>
-          <Footer content="@ 2004-2023 https://github.com/chnirt All rights reserved"></Footer>
+          <Footer content="@ 2004-2023 https://groovetechnology.com All rights reserved"></Footer>
         </List.Item>
       </List>
     </div>

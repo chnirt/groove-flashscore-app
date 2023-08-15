@@ -56,7 +56,7 @@ const Login = () => {
             { type: 'email', message: 'Invalid email' },
           ]}
         >
-          <Input type="email" autoComplete="email" placeholder="chnirt" />
+          <Input type="email" autoComplete="email" placeholder="yourmail@example.com" />
         </Form.Item>
         <Form.Item
           name="password"

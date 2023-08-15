@@ -75,7 +75,7 @@ const Ranking = () => {
       <PullToRefresh onRefresh={onRefresh}>
         <div className="flex flex-col gap-5 px-4">
           <div className="flex flex-row gap-4">
-            {['CLUB SCORERS', 'GOAL SCORERS', 'GOALKEEPERS'].map(
+            {['POINTS TABLE', 'TOP GOAL SCORERS', 'TOP GOALKEEPERS'].map(
               (name: string, ti: number) => (
                 <MatchButton
                   key={`tab-${ti}`}
