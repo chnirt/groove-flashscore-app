@@ -42,6 +42,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         win: 0,
         draw: 0,
         lose: 0,
+        goalDifference: 0,
         points: 0,
       }))
       setTeams(teamDocs)

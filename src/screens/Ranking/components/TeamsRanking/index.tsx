@@ -21,6 +21,10 @@ const Teams = ({ rows }: { rows: any[] }) => {
       headerName: 'L',
     },
     {
+      field: 'goalDifference',
+      headerName: 'GD',
+    },
+    {
       field: 'points',
       headerName: 'PTS',
       renderCell: (fieldValue: any) => {
