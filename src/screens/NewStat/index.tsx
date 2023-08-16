@@ -23,10 +23,15 @@ const initialValues = MASTER_MOCK_DATA.NEW_STAT
 const NewStat = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
+  const statIdState = Form.useWatch('statId', form)
   const { matchId, statId } = useParams()
   const isEditMode = statId
   const { user } = useAuth()
   const { matches, players, refetchStat } = useFlashScore()
+  const [statDocRefState, setStatDocRefState] = useState<DocumentReference<
+    DocumentData,
+    DocumentData
+  > | null>(null)
   const filteredPlayers = useMemo(() => {
     if (matchId === undefined) return undefined
     const foundedMatch = matches?.find((match) => match.id === matchId)
@@ -36,17 +41,18 @@ const NewStat = () => {
       [foundedMatch.homeTeamId, foundedMatch.awayTeamId].includes(player.teamId)
     )
   }, [matchId, matches, players])
-  const [statDocRefState, setStatDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
+  const goalScorers = useMemo(() => filteredPlayers, [filteredPlayers])
+  const goalKeepers = useMemo(
+    () => filteredPlayers?.filter((player) => player.goalkeeper),
+    [filteredPlayers]
+  )
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (user === null) return
       try {
         Loading.get.show()
-        const { statId, playerId } = values
+        const { statId, playerId, goalKeeperId } = values
         const foundPlayer = filteredPlayers?.find(
           (filteredPlayer) => filteredPlayer.id === playerId
         )
@@ -57,6 +63,7 @@ const NewStat = () => {
           statId,
           playerId,
           playerName,
+          ...(goalKeeperId ? { goalKeeperId } : {}),
           teamId,
           matchId,
           uid,
@@ -212,10 +219,9 @@ const NewStat = () => {
             },
           ]}
         >
-          <Select className="w-full" disabled={filteredPlayers?.length === 0}>
-            {filteredPlayers?.length !== undefined &&
-            filteredPlayers?.length > 0
-              ? filteredPlayers.map((player, ti: number) => (
+          <Select className="w-full" disabled={goalScorers?.length === 0}>
+            {goalScorers?.length !== undefined && goalScorers?.length > 0
+              ? goalScorers.map((player, ti: number) => (
                   <Select.Option key={`player-${ti}`} value={player.id}>
                     {player.name}
                   </Select.Option>
@@ -223,6 +229,29 @@ const NewStat = () => {
               : null}
           </Select>
         </Form.Item>
+
+        {statIdState === 'GOAL' && (
+          <Form.Item
+            name="goalKeeperId"
+            label="GoalKeeper"
+            rules={[
+              {
+                required: true,
+                message: 'GoalKeeper is required',
+              },
+            ]}
+          >
+            <Select className="w-full" disabled={goalKeepers?.length === 0}>
+              {goalKeepers?.length !== undefined && goalKeepers?.length > 0
+                ? goalKeepers.map((player, ti: number) => (
+                    <Select.Option key={`player-${ti}`} value={player.id}>
+                      {player.name}
+                    </Select.Option>
+                  ))
+                : null}
+            </Select>
+          </Form.Item>
+        )}
       </Form>
 
       {user && isEditMode ? (

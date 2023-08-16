@@ -6,6 +6,8 @@ import { Loading } from '../../global'
 import PasswordInput from '../../components/PasswordInput'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { IS_DEVELOP, eventNames } from '../../constants'
+import { Link } from 'react-router-dom'
+import { routes } from '../../routes'
 
 const initialValues = MASTER_MOCK_DATA.LOGIN
 
@@ -56,7 +58,11 @@ const Login = () => {
             { type: 'email', message: 'Invalid email' },
           ]}
         >
-          <Input type="email" autoComplete="email" placeholder="yourmail@example.com" />
+          <Input
+            type="email"
+            autoComplete="email"
+            placeholder="yourmail@example.com"
+          />
         </Form.Item>
         <Form.Item
           name="password"
@@ -76,6 +82,11 @@ const Login = () => {
           <PasswordInput autoComplete="current-password" placeholder="******" />
         </Form.Item>
       </Form>
+      <Link to={routes.register}>
+        <Button color="primary" fill="none">
+          REGISTER
+        </Button>
+      </Link>
     </Fragment>
   )
 }

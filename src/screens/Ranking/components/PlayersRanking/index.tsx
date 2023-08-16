@@ -5,6 +5,10 @@ const PlayersRanking = ({ rows }: { rows: any[] }) => {
     { field: 'rank', headerName: '', className: 'min-w-[40px]' },
     { field: 'name', headerName: 'Name', className: 'w-full' },
     {
+      field: 'matches',
+      headerName: 'M',
+    },
+    {
       field: 'points',
       headerName: 'PTS',
       renderCell: (fieldValue: any) => {

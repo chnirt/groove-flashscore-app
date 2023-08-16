@@ -51,7 +51,7 @@ const Home = () => {
     handleFetchTeam()
   }, [fetchTeam, fetchMatch, fetchPlayer, fetchStat, navigate])
   return (
-    <div className="bg-black1">
+    <div className="min-h-screen bg-black1">
       <Outlet context={auth} />
     </div>
   )

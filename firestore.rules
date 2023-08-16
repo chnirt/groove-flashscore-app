@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // match /{document=**} {
+    //   allow read, write: if false;
+    // }
+    function isSignedIn() {
+    	return request.auth != null;
+    }
+    function belongsTo(userId) {
+    	return request.auth.uid == userId;
+		}
+    function signedInOrPublic() {
+      return request.auth.uid != null || resource.data.visibility == 'public';
+    }
+    match /users/{user} {
+      allow read: if true;
+      allow write: if signedInOrPublic();
+    }
+    match /teams/{team} {
+      allow read: if true;
+      allow write: if signedInOrPublic();
+    }
+    match /matches/{myMatch} {
+      allow read: if true;
+      allow write: if signedInOrPublic();
+    }
+    match /players/{player} {
+      allow read: if true;
+      allow write: if signedInOrPublic();
+    }
+    match /stats/{stat} {
+      allow read: if true;
+      allow write: if signedInOrPublic();
+    }
+  }
+}

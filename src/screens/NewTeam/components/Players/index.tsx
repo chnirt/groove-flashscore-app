@@ -41,7 +41,9 @@ const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
         onChange={setSearchText}
       />
       {filterPlayers === undefined ? (
-        <Skeleton animated className="h-screen w-full rounded-3xl" />
+        <div className="px-4">
+          <Skeleton animated className="h-screen w-full rounded-3xl" />
+        </div>
       ) : filterPlayers.length === 0 ? null : (
         <List header={header} mode="card">
           {filterPlayers.map((player, pi: number) => {

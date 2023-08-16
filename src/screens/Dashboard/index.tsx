@@ -156,32 +156,32 @@ const Dashboard = () => {
             </div>
           )}
 
-          {myUpcomingMatches === undefined ? (
-            <div className="flex flex-col gap-8">
-              <div className="px-4">
-                <Skeleton.Title className="!mb-0 !mt-0 h-7" />
-              </div>
-              <div className="flex flex-col gap-4 px-4">
-                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
-                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
-                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
-                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
-              </div>
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between px-4">
+              <h2 className="m-0 text-lg font-bold text-gray1">
+                Upcoming Matches
+              </h2>
+              {user ? (
+                <Link to={routes.newMatch}>
+                  <button className="bg-transparent text-base font-medium text-secondary">
+                    New match
+                  </button>
+                </Link>
+              ) : null}
             </div>
-          ) : myUpcomingMatches.length === 0 ? null : (
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center justify-between px-4">
-                <h2 className="m-0 text-lg font-bold text-gray1">
-                  Upcoming Matches
-                </h2>
-                {user ? (
-                  <Link to={routes.newMatch}>
-                    <button className="bg-transparent text-base font-medium text-secondary">
-                      New match
-                    </button>
-                  </Link>
-                ) : null}
+            {myUpcomingMatches === undefined ? (
+              <div className="flex flex-col gap-8">
+                <div className="px-4">
+                  <Skeleton.Title className="!mb-0 !mt-0 h-7" />
+                </div>
+                <div className="flex flex-col gap-4 px-4">
+                  <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                  <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                  <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                  <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                </div>
               </div>
+            ) : myUpcomingMatches.length === 0 ? null : (
               <div className="flex flex-col gap-4 px-4">
                 {myUpcomingMatches.map((match, mi: number) => (
                   <MatchCard
@@ -191,8 +191,8 @@ const Dashboard = () => {
                   />
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {myMatchResult?.length === undefined ? (
             <div className="flex flex-col gap-8">
@@ -216,7 +216,6 @@ const Dashboard = () => {
               <div className="flex flex-col gap-4 px-4">
                 {myMatchResult.map((match, mi: number) => (
                   <MatchCard
-                    className="bg-black1"
                     key={`match-${mi}`}
                     match={match}
                     onClick={() => navigateMatch(match)}

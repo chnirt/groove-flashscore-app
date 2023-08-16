@@ -62,6 +62,7 @@ export const MASTER_MOCK_DATA = {
   NEW_STAT: {
     statId: 'GOAL',
     playerId: '',
+    goalKeeperId: '',
   },
 }
 

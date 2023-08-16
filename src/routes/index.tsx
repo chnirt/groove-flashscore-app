@@ -203,16 +203,16 @@ export const router = createBrowserRouter([
               />
             ),
           },
-          // {
-          //   path: routes.register,
-          //   element: (
-          //     <Loadable
-          //       {...{
-          //         factory: () => import('../screens/Register'),
-          //       }}
-          //     />
-          //   ),
-          // },
+          {
+            path: routes.register,
+            element: (
+              <Loadable
+                {...{
+                  factory: () => import('../screens/Register'),
+                }}
+              />
+            ),
+          },
         ],
       },
       {

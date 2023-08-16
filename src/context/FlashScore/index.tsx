@@ -42,21 +42,64 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const teamColGroupRef = getColRef('teams')
       const q = query(teamColGroupRef)
       querySnapshot = await getDocs(q)
-      const teamDocs = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        matches: 0,
-        win: 0,
-        draw: 0,
-        lose: 0,
-        goalDifference: 0,
-        points: 0,
-      }))
+      const teamDocs = querySnapshot.docs.map((doc) => {
+        const matchResult = matches?.filter(
+          (match) =>
+            match.matchType === 'RESULT' &&
+            [match.homeTeamId, match.awayTeamId].includes(doc.id)
+        )
+
+        const win = matchResult
+          ?.map((match) =>
+            match.homeTeamId === doc.id
+              ? match?.homeRanking?.win
+              : match?.awayRanking?.win
+          )
+          .reduce((a, b) => a + b, 0)
+        const draw = matchResult
+          ?.map((match) =>
+            match.homeTeamId === doc.id
+              ? match?.homeRanking?.draw
+              : match?.awayRanking?.draw
+          )
+          .reduce((a, b) => a + b, 0)
+        const lose = matchResult
+          ?.map((match) =>
+            match.homeTeamId === doc.id
+              ? match?.homeRanking?.lose
+              : match?.awayRanking?.lose
+          )
+          .reduce((a, b) => a + b, 0)
+        const goalDifference = matchResult
+          ?.map((match) =>
+            match.homeTeamId === doc.id
+              ? match?.homeRanking?.goalDifference
+              : match?.awayRanking?.goalDifference
+          )
+          .reduce((a, b) => a + b, 0)
+        const points = matchResult
+          ?.map((match) =>
+            match.homeTeamId === doc.id
+              ? match?.homeRanking?.points
+              : match?.awayRanking?.points
+          )
+          .reduce((a, b) => a + b, 0)
+        return {
+          id: doc.id,
+          ...doc.data(),
+          matches: matchResult?.length ?? 0,
+          win: win ?? 0,
+          draw: draw ?? 0,
+          lose: lose ?? 0,
+          goalDifference: goalDifference ?? 0,
+          points: points ?? 0,
+        }
+      })
       setTeams(teamDocs)
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [matches])
 
   const fetchTeam = useCallback(async () => {
     if (teams?.length) return
@@ -94,15 +137,37 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         const isWin = goalDifference > 0
         const isDraw = goalDifference === 0
         const isLose = goalDifference < 0
-        const ranking = {
-          homeGoals,
-          awayGoals,
-          win: isWin ? 1 : 0,
-          draw: isDraw ? 1 : 0,
-          lose: isLose ? 1 : 0,
-          goalDifference,
-          points: isWin ? 3 : isDraw ? 1 : isLose ? 0 : 0,
-        }
+        const homeRanking = stats
+          ? {
+              win: isWin ? 1 : 0,
+              draw: isDraw ? 1 : 0,
+              lose: isLose ? 1 : 0,
+              goalDifference,
+              points: isWin ? 3 : isDraw ? 1 : isLose ? 0 : 0,
+            }
+          : {
+              win: 0,
+              draw: 0,
+              lose: 0,
+              goalDifference: 0,
+              points: 0,
+            }
+
+        const awayRanking = stats
+          ? {
+              win: !isWin ? 1 : 0,
+              draw: isDraw ? 1 : 0,
+              lose: !isLose ? 1 : 0,
+              goalDifference: -goalDifference,
+              points: !isWin ? 3 : isDraw ? 1 : !isLose ? 0 : 0,
+            }
+          : {
+              win: 0,
+              draw: 0,
+              lose: 0,
+              goalDifference: 0,
+              points: 0,
+            }
 
         return {
           id: doc.id,
@@ -114,7 +179,10 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
             : isResult
             ? 'RESULT'
             : '',
-          ranking,
+          homeGoals,
+          awayGoals,
+          homeRanking,
+          awayRanking,
         }
       })
       setMatches(matchDocs)
@@ -133,16 +201,33 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const playerColGroupRef = getColRef('players')
       const q = query(playerColGroupRef)
       querySnapshot = await getDocs(q)
-      const playerDocs = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        points: 0,
-      }))
+      const playerDocs = querySnapshot.docs.map((doc) => {
+        const data = doc.data()
+        const isGoalKeeper = data.goalkeeper
+        const teamId = data.teamId
+        const matchResult = matches?.filter(
+          (match) =>
+            match.matchType === 'RESULT' &&
+            [match.homeTeamId, match.awayTeamId].includes(teamId)
+        )
+        const goalkeeperPoints = matchResult?.map((match) =>
+          match.homeTeamId === teamId ? -match?.awayGoals : -match?.homeGoals
+        )
+        const points = stats?.filter(
+          (stat) => stat.statId === 'GOAL' && stat.playerId === doc.id
+        ).length
+        return {
+          id: doc.id,
+          ...doc.data(),
+          matches: matchResult?.length ?? 0,
+          points: isGoalKeeper ? goalkeeperPoints : points ?? 0,
+        }
+      })
       setPlayers(playerDocs)
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [matches, stats])
 
   const fetchPlayer = useCallback(async () => {
     if (players?.length) return
@@ -176,6 +261,20 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     }
     handleRefetchMatch()
   }, [refetchMatch])
+
+  useEffect(() => {
+    const handleRefetchTeam = async () => {
+      await refetchTeam()
+    }
+    handleRefetchTeam()
+  }, [refetchTeam])
+
+  useEffect(() => {
+    const handleRefetchPlayer = async () => {
+      await refetchPlayer()
+    }
+    handleRefetchPlayer()
+  }, [refetchPlayer])
 
   const value = useMemo(
     () => ({

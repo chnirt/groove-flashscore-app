@@ -6,7 +6,7 @@ import 'easymde/dist/easymde.min.css'
 import useAuth from '../../hooks/useAuth'
 import { Loading } from '../../global'
 import { getDocRef, getDocument, updateDocument } from '../../firebase/service'
-import { routes } from '../../routes'
+// import { routes } from '../../routes'
 import { useNavigate } from 'react-router-dom'
 
 // const markdown = `
@@ -54,7 +54,7 @@ const Rules = () => {
   const fetchRules = useCallback(async () => {
     const userDocRef = getDocRef('users', uid)
     const userDocData: any = await getDocument(userDocRef)
-    setValue(userDocData.rules)
+    setValue(userDocData?.rules)
   }, [])
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const Rules = () => {
         await fetchRules()
         // do something
       } catch (e) {
-        navigate(routes.error)
+        // navigate(routes.error)
       }
     }
 

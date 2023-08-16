@@ -47,8 +47,8 @@ const Match = () => {
         return [
           {
             title: 'Goals',
-            home: myMatch.ranking.homeGoals,
-            away: myMatch.ranking.awayGoals,
+            home: myMatch.homeGoals,
+            away: myMatch.awayGoals,
           },
           {
             title: 'Yellow cards',
@@ -109,8 +109,8 @@ const Match = () => {
         {myMatch ? (
           <LiveMatchCard
             match={myMatch}
-            homeGoals={myMatch.ranking.homeGoals}
-            awayGoals={myMatch.ranking.awayGoals}
+            homeGoals={myMatch.homeGoals}
+            awayGoals={myMatch.awayGoals}
           />
         ) : (
           <Skeleton animated className="h-[13rem] w-full rounded-3xl" />

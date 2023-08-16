@@ -27,6 +27,7 @@ import {
 import { Loading } from '../../global'
 import { routes } from '../../routes'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
+import useFlashScore from '../../context/FlashScore/useFlashScore'
 
 const initialValues = MASTER_MOCK_DATA.NEW_PLAYER
 
@@ -39,6 +40,7 @@ const NewMatch = () => {
   const { teamId, playerId } = useParams()
   const isEditMode = playerId
   const { user } = useAuth()
+  const { refetchPlayer } = useFlashScore()
   const [playerDocRefState, setPlayerDocRefState] = useState<DocumentReference<
     DocumentData,
     DocumentData
@@ -72,6 +74,10 @@ const NewMatch = () => {
           await addDocument(playerDocRef, playerData)
         }
 
+        if (typeof refetchPlayer === 'function') {
+          await refetchPlayer()
+        }
+
         navigate(-1)
         Toast.show({
           icon: 'success',
@@ -88,7 +94,7 @@ const NewMatch = () => {
         Loading.get.hide()
       }
     },
-    [user, teamId, navigate, isEditMode, playerDocRefState]
+    [user, teamId, navigate, isEditMode, playerDocRefState, refetchPlayer]
   )
 
   const removePlayer = useCallback(async () => {
@@ -247,11 +253,7 @@ const NewMatch = () => {
           </Radio.Group>
         </Form.Item>
         {uploadMethod === 'file' && (
-          <Form.Item
-            name="playerAvatar"
-            label="Player Avatar"
-            rules={[{ required: true, message: 'Player Avatar is required' }]}
-          >
+          <Form.Item name="playerAvatar" label="Player Avatar">
             <ImageUploader
               upload={function (file: File): Promise<ImageUploadItem> {
                 const isJpgOrPng =
