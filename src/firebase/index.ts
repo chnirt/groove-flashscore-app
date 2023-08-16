@@ -8,7 +8,7 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
 
-import { env } from '../constants'
+import { IS_DEVELOP, env } from '../constants'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -39,7 +39,7 @@ export const auth = getAuth(app)
 // Create a root reference
 export const storage = getStorage()
 
-if (location.hostname === 'localhost') {
+if (IS_DEVELOP) {
   const AUTH_PORT = 9099
   const FIRESTORE_PORT = 8080
   const STORAGE_PORT = 9199
