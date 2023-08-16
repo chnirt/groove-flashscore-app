@@ -1,5 +1,5 @@
 import { NavBar, Skeleton } from 'antd-mobile'
-import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
+import { generatePath, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
 import { DocumentData, DocumentReference } from 'firebase/firestore'
