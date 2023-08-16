@@ -30,6 +30,7 @@
     "react-markdown": "^8.0.7",
     "react-router-dom": "^6.15.0",
     "react-simplemde-editor": "^5.2.0",
+    "react-use": "^17.4.0",
     "sort-by": "^1.2.0",
     "tailwind-merge": "^1.14.0",
     "tailwind-scrollbar-hide": "^1.1.7"

@@ -1,7 +1,7 @@
 import { FC, useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { TabBar } from 'antd-mobile'
-import { GoHomeFill, GoHubot, GoLaw, GoTrophy } from 'react-icons/go'
+import { GoHomeFill, GoHubot, GoLaw, GoPeople, GoTrophy } from 'react-icons/go'
 import { routes } from '../../routes'
 import useAuth from '../../hooks/useAuth'
 
@@ -23,6 +23,10 @@ const BottomTabBar: FC = () => {
       {
         key: routes.dashboard,
         icon: <GoHomeFill className="h-7 w-7" />,
+      },
+      {
+        key: routes.players,
+        icon: <GoPeople />,
       },
       {
         key: routes.rules,

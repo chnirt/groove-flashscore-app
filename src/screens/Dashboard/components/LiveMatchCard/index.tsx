@@ -71,7 +71,6 @@ const LiveMatchCard = ({
                 className="h-14 w-14"
                 src={homeTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
-                loading="lazy"
               />
             ) : null}
             <p
@@ -115,7 +114,6 @@ const LiveMatchCard = ({
                 className="h-14 w-14 object-contain"
                 src={awayTeamLogo}
                 alt={`logo-${homeTeamLogo}`}
-                loading="lazy"
               />
             ) : null}
             <p

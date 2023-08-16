@@ -320,7 +320,7 @@ const NewTeam = () => {
           ) : null}
         </Form>
 
-        {user && teamId ? <Players teamId={teamId} /> : null}
+        {user && teamId ? <Players header="Players" teamId={teamId} /> : null}
       </div>
     </div>
   )
