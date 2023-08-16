@@ -13,6 +13,7 @@ import MatchCard from './components/MatchCard'
 import LiveMatchCard, { MatchType } from './components/LiveMatchCard'
 import TeamButton from './components/TeamButton'
 import useAuth from '../../hooks/useAuth'
+import Logo from '../../assets/logo.png'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -113,7 +114,8 @@ const Dashboard = () => {
         }
       >
         <button className="bg-transparent">
-          <p className="text-lg text-black2">GROOVE LEAGUE 2023</p>
+          <img className="h-8" src={Logo} />
+          {/* <p className="text-lg text-black2">GROOVE LEAGUE 2023</p> */}
         </button>
       </NavBar>
 
