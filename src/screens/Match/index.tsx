@@ -1,10 +1,8 @@
 import { NavBar, Skeleton } from 'antd-mobile'
 import { generatePath, useNavigate, useParams } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
-import { DocumentData, DocumentReference } from 'firebase/firestore'
 import { routes } from '../../routes'
-import { getDocRef, getDocument } from '../../firebase/service'
 import LiveMatchCard from '../Dashboard/components/LiveMatchCard'
 import MatchButton from './components/MatchButton'
 import useAuth from '../../hooks/useAuth'
@@ -16,70 +14,59 @@ const Match = () => {
   const { matchId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { fetchTeam, fetchMatch } = useFlashScore()
-  const [match, setMatch] = useState<any | undefined>()
+  const { matches, stats } = useFlashScore()
+  const myMatch = useMemo(
+    () => matches?.find((match) => match.id === matchId),
+    [matches, matchId]
+  )
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
-  const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
-
-  const fetchMatchById = useCallback(async (matchId: string) => {
-    if (matchId === undefined) return
-    const matchDocRef = getDocRef('matches', matchId)
-    setMatchDocRefState(matchDocRef)
-    const matchDocData: any = await getDocument(matchDocRef)
-    setMatch(matchDocData)
-  }, [])
-
-  useEffect(() => {
-    const handleFetchMatch = async () => {
-      try {
-        if (matchId === undefined) return
-        if (typeof fetchTeam !== 'function') return
-        if (typeof fetchMatch !== 'function') return
-        if (typeof fetchMatchById !== 'function') return
-        await Promise.all([fetchTeam(), fetchMatch(), fetchMatchById(matchId)])
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
-
-    handleFetchMatch()
-  }, [matchId, fetchMatchById, fetchTeam, fetchMatch, navigate])
 
   const renderTabContent = useCallback(() => {
+    const homeYellowCards =
+      stats?.filter(
+        (stat) =>
+          stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.homeTeamId
+      ).length ?? 0
+    const awayYellowCards =
+      stats?.filter(
+        (stat) =>
+          stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.awayTeamId
+      ).length ?? 0
+    const homeRedCards =
+      stats?.filter(
+        (stat) =>
+          stat.statId === 'RED_CARD' && stat.teamId === myMatch.homeTeamId
+      ).length ?? 0
+    const awayRedCards =
+      stats?.filter(
+        (stat) =>
+          stat.statId === 'RED_CARD' && stat.teamId === myMatch.awayTeamId
+      ).length ?? 0
     switch (selectedIndex) {
       case 0:
         return [
           {
             title: 'Goals',
-            // home: 2,
-            // away: 6,
-            home: 0,
-            away: 0,
+            home: myMatch.ranking.homeGoals,
+            away: myMatch.ranking.awayGoals,
           },
           {
-            title: 'Yellow card',
-            // home: 3,
-            // away: 2,
-            home: 0,
-            away: 0,
+            title: 'Yellow cards',
+            home: homeYellowCards,
+            away: awayYellowCards,
           },
           {
-            title: 'Red card',
-            // home: 1,
-            // away: 1,
-            home: 0,
-            away: 0,
+            title: 'Red cards',
+            home: homeRedCards,
+            away: awayRedCards,
           },
         ].map((stat, si: number) => <Stat key={`stat-${si}`} stat={stat} />)
       case 1:
-        return <LineUp matchDocRefState={matchDocRefState} match={match} />
+        return <LineUp match={myMatch} />
       default:
         return null
     }
-  }, [selectedIndex, matchDocRefState, match])
+  }, [selectedIndex, myMatch, stats])
 
   return (
     <div className="flex flex-col">
@@ -111,16 +98,20 @@ const Match = () => {
           ) : null
         }
       >
-        {match?.groupStage ? (
-          match.groupStage
+        {myMatch?.groupStage ? (
+          myMatch.groupStage
         ) : (
           <Skeleton.Title className="!mb-0 !mt-0 h-7" />
         )}
       </NavBar>
 
       <div className="flex flex-col gap-8 p-4">
-        {match ? (
-          <LiveMatchCard match={match} />
+        {myMatch ? (
+          <LiveMatchCard
+            match={myMatch}
+            homeGoals={myMatch.ranking.homeGoals}
+            awayGoals={myMatch.ranking.awayGoals}
+          />
         ) : (
           <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
         )}

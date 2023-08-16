@@ -8,7 +8,7 @@ import {
   Switch,
   Toast,
 } from 'antd-mobile'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import dayjs from 'dayjs'
 import { Select } from 'antd'
@@ -26,6 +26,7 @@ import {
 } from '../../firebase/service'
 import { Loading } from '../../global'
 import { routes } from '../../routes'
+import Stats from './components/Stats'
 
 const initialValues = MASTER_MOCK_DATA.NEW_MATCH
 
@@ -133,8 +134,21 @@ const NewMatch = () => {
           </button>
         }
         backArrow={false}
+        right={
+          user && isEditMode ? (
+            <Link
+              to={generatePath(routes.newStat, {
+                matchId,
+              })}
+            >
+              <button className="bg-transparent text-base font-medium text-secondary">
+                New stat
+              </button>
+            </Link>
+          ) : null
+        }
       >
-        {isEditMode ? 'Edit Team' : 'New Team'}
+        {isEditMode ? 'Edit Match' : 'New Match'}
       </NavBar>
 
       <Form
@@ -257,6 +271,8 @@ const NewMatch = () => {
           <Switch />
         </Form.Item>
       </Form>
+
+      {user && matchId ? <Stats header="Stats" matchId={matchId} /> : null}
     </div>
   )
 }

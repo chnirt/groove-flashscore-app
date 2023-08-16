@@ -59,6 +59,10 @@ export const MASTER_MOCK_DATA = {
     uploadMethod: 'file',
     lineUpFile: [],
   },
+  NEW_STAT: {
+    statId: 'GOAL',
+    playerId: '',
+  },
 }
 
 export const TEAMS = [

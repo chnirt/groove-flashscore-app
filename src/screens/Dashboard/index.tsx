@@ -4,9 +4,8 @@ import {
   PullToRefresh,
   Skeleton,
 } from 'antd-mobile'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
-import moment from 'moment'
 import { routes } from '../../routes'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import MatchCard from './components/MatchCard'
@@ -18,51 +17,37 @@ import Logo from '../../assets/logo.png'
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { teams, fetchTeam, refetchTeam, matches, fetchMatch, refetchMatch } =
-    useFlashScore()
+  const { teams, refetchTeam, matches, refetchMatch } = useFlashScore()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
   const formattedTeams = useMemo(
     () => (teams ? [{ name: 'All' }, ...teams] : []),
     [teams]
   )
   const filteredMatches = useMemo(() => {
-    if (selectedIndex === 0) return matches
+    const visibleMatches = matches?.filter((match) =>
+      user ? true : !match.hidden
+    )
+    if (selectedIndex === 0) return visibleMatches
     const foundTeam = formattedTeams[selectedIndex]
-    if (foundTeam === undefined) return matches
-    const result = matches?.filter((match) =>
+    if (foundTeam === undefined) return visibleMatches
+    const result = visibleMatches?.filter((match) =>
       [match.homeTeamId, match.awayTeamId].includes(foundTeam.id)
     )
     return result
-  }, [matches, selectedIndex, formattedTeams])
-  const myLiveMatches = useMemo(() => {
-    const result = filteredMatches?.filter((match) => {
-      const playDate = moment(match.playDate.toDate())
-      const now = moment()
-      return (
-        moment(match.playDate.toDate()).isSameOrBefore(moment()) &&
-        now.diff(playDate, 'minutes') <= 60
-      )
-    })
-    return result
-  }, [filteredMatches])
-  const myUpcomingMatches = useMemo(() => {
-    const result = filteredMatches?.filter((match) =>
-      moment(match.playDate.toDate()).isAfter(moment())
-    )
-    return result
-  }, [filteredMatches])
+  }, [matches, selectedIndex, formattedTeams, user])
+  const myLiveMatches = useMemo(
+    () => filteredMatches?.filter((match) => match.matchType === 'LIVE'),
+    [filteredMatches]
+  )
+  const myUpcomingMatches = useMemo(
+    () => filteredMatches?.filter((match) => match.matchType === 'UPCOMING'),
+    [filteredMatches]
+  )
 
-  const myMatchResult = useMemo(() => {
-    const result = filteredMatches?.filter((match) => {
-      const playDate = moment(match.playDate.toDate())
-      const now = moment()
-      return (
-        moment(match.playDate.toDate()).isSameOrBefore(moment()) &&
-        now.diff(playDate, 'minutes') > 60
-      )
-    })
-    return result
-  }, [filteredMatches])
+  const myMatchResult = useMemo(
+    () => filteredMatches?.filter((match) => match.matchType === 'RESULT'),
+    [filteredMatches]
+  )
 
   const navigateMatch = useCallback(
     (match: MatchType) => {
@@ -82,21 +67,6 @@ const Dashboard = () => {
     refetchMatch()
     setSelectedIndex(0)
   }, [refetchTeam, refetchMatch])
-
-  useEffect(() => {
-    const handleFetchTeam = async () => {
-      try {
-        if (typeof fetchTeam !== 'function') return
-        if (typeof fetchMatch !== 'function') return
-        await Promise.all([fetchTeam(), fetchMatch()])
-        // do something
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
-
-    handleFetchTeam()
-  }, [fetchTeam, fetchMatch, navigate])
 
   return (
     <div className="flex flex-col">
@@ -126,8 +96,6 @@ const Dashboard = () => {
       >
         <button className="bg-transparent">
           <img className="h-8" src={Logo} />
-          {/* <p classNa
-          me="text-lg text-black2">GROOVE LEAGUE 2023</p> */}
         </button>
       </NavBar>
 
@@ -248,6 +216,7 @@ const Dashboard = () => {
               <div className="flex flex-col gap-4 px-4">
                 {myMatchResult.map((match, mi: number) => (
                   <MatchCard
+                    className="bg-black1"
                     key={`match-${mi}`}
                     match={match}
                     onClick={() => navigateMatch(match)}

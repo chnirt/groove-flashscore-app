@@ -9,36 +9,34 @@ import {
   Toast,
 } from 'antd-mobile'
 import { useCallback, useEffect } from 'react'
-import { DocumentData, DocumentReference } from 'firebase/firestore'
 import { GoPlusCircle } from 'react-icons/go'
 import { MASTER_MOCK_DATA } from '../../../../mocks'
 import { Loading } from '../../../../global'
 import useAuth from '../../../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { uploadStorageBytesResumable } from '../../../../firebase/storage'
-import { getDocument, updateDocument } from '../../../../firebase/service'
+import {
+  getDocRef,
+  getDocument,
+  updateDocument,
+} from '../../../../firebase/service'
 import { routes } from '../../../../routes'
 
 const initialValues = MASTER_MOCK_DATA.NEW_LINEUP
 
 const maxCount = 1
 
-const LineUp = ({
-  matchDocRefState,
-  match,
-}: {
-  matchDocRefState: DocumentReference<DocumentData, DocumentData> | null
-  match: any
-}) => {
+const LineUp = ({ match }: { match: any }) => {
   const [form] = Form.useForm()
   const uploadMethod = Form.useWatch('uploadMethod', form)
   const navigate = useNavigate()
   const { user } = useAuth()
+  const matchDocRef = getDocRef('matches', match.id)
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (user === null) return
-      if (matchDocRefState === null) return
+      if (match === null) return
       try {
         Loading.get.show()
         const { lineUpFile } = values
@@ -49,7 +47,7 @@ const LineUp = ({
           file,
         }
 
-        await updateDocument(matchDocRefState, lineUpData)
+        await updateDocument(matchDocRef, lineUpData)
 
         Toast.show({
           icon: 'success',
@@ -66,12 +64,12 @@ const LineUp = ({
         Loading.get.hide()
       }
     },
-    [user, matchDocRefState]
+    [user, match, matchDocRef]
   )
 
   const fetchLineUpById = useCallback(
-    async (matchDocRefState: any) => {
-      const lineUpDocData: any = await getDocument(matchDocRefState)
+    async (matchDocRef: any) => {
+      const lineUpDocData: any = await getDocument(matchDocRef)
       form.setFieldsValue({
         ...lineUpDocData,
         lineUpFile: lineUpDocData.file,
@@ -84,7 +82,7 @@ const LineUp = ({
     if (typeof fetchLineUpById !== 'function') return
     const handleFetchTeam = async () => {
       try {
-        await fetchLineUpById(matchDocRefState)
+        await fetchLineUpById(matchDocRef)
         // do something
       } catch (e) {
         navigate(routes.error)
@@ -92,7 +90,7 @@ const LineUp = ({
     }
 
     handleFetchTeam()
-  }, [matchDocRefState, fetchLineUpById, navigate])
+  }, [fetchLineUpById, navigate, matchDocRef])
 
   if (user)
     return (

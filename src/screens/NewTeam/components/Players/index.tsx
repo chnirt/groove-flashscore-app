@@ -1,20 +1,15 @@
 import { Avatar, List, SearchBar, Skeleton } from 'antd-mobile'
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { generatePath, useNavigate } from 'react-router-dom'
-import { getDocs, query, where } from 'firebase/firestore'
 import { useDebounce } from 'react-use'
 import { routes } from '../../../../routes'
-import { getColRef } from '../../../../firebase/service'
 import useAuth from '../../../../hooks/useAuth'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
-
-let querySnapshot
 
 const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { teams } = useFlashScore()
-  const [players, setPlayers] = useState<any[]>()
+  const { teams, players } = useFlashScore()
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState('')
   useDebounce(
@@ -25,42 +20,17 @@ const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
     [searchText]
   )
 
-  const fetchPlayers = useCallback(async (teamId?: string) => {
-    const playerColGroupRef = getColRef('players')
-    const q = teamId
-      ? query(playerColGroupRef, where('teamId', '==', teamId))
-      : query(playerColGroupRef)
-    querySnapshot = await getDocs(q)
-    const playerDocs = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }))
-    setPlayers(playerDocs)
-  }, [])
-
-  useEffect(() => {
-    const handleFetchTeam = async () => {
-      try {
-        if (typeof fetchPlayers !== 'function') return
-        await fetchPlayers(teamId)
-        // do something
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
-
-    handleFetchTeam()
-  }, [teamId, fetchPlayers, navigate])
-
   const filterPlayers = useMemo(() => {
-    if (players === undefined) return undefined
-    if (debouncedSearchText.length === 0) return players
-    return players.filter((player: any) =>
+    const visiblePlayers = players?.filter((player) =>
+      teamId ? player.teamId === teamId : true
+    )
+    if (debouncedSearchText.length === 0) return visiblePlayers
+    return visiblePlayers?.filter((player: any) =>
       String(player.name)
         .toLowerCase()
         .includes(String(debouncedSearchText).toLowerCase())
     )
-  }, [players, debouncedSearchText])
+  }, [teamId, players, debouncedSearchText])
 
   return (
     <Fragment>

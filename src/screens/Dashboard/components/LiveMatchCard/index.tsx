@@ -2,6 +2,7 @@ import { twMerge } from 'tailwind-merge'
 import moment from 'moment'
 import { Timestamp } from 'firebase/firestore'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
+import { MATCH_TIMING } from '../../../../constants'
 
 export type MatchType = {
   id: string
@@ -17,6 +18,8 @@ export type LiveMatchCardProps = {
   selected?: boolean
   onClick?: () => void
   completed?: boolean
+  homeGoals?: number
+  awayGoals?: number
 }
 
 const LiveMatchCard = ({
@@ -24,6 +27,8 @@ const LiveMatchCard = ({
   match,
   selected,
   onClick,
+  homeGoals = 0,
+  awayGoals = 0,
 }: LiveMatchCardProps) => {
   const { teams } = useFlashScore()
   if (teams?.length === 0) return null
@@ -40,9 +45,11 @@ const LiveMatchCard = ({
     .asMinutes()
     .valueOf()
   const timeDisplay =
-    time > 90 ? "90+'" : time < 0 ? 'Updating' : `${Math.round(time)}'`
-  const homeScore = 0
-  const awayScore = 0
+    time > MATCH_TIMING
+      ? 'Overtime'
+      : time < 0
+      ? 'Updating'
+      : `${Math.round(time)}'`
   return (
     <button
       className={twMerge(
@@ -90,7 +97,7 @@ const LiveMatchCard = ({
                 selected && 'text-white'
               )}
             >
-              {homeScore} : {awayScore}
+              {homeGoals} : {awayGoals}
             </p>
             <div
               className={twMerge(

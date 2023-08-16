@@ -18,6 +18,8 @@ export const routes = {
   newMatch: '/newMatch',
   match: '/matches/:matchId',
   editMatch: '/matches/:matchId/edit',
+  newStat: '/matches/:matchId/newStat',
+  editStat: '/matches/:matchId/newStat/:statId',
   rules: '/rules',
   ranking: '/ranking',
 
@@ -150,6 +152,26 @@ export const router = createBrowserRouter([
                   <Loadable
                     {...{
                       factory: () => import('../screens/NewMatch'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.newStat,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/NewStat'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.editStat,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/NewStat'),
                     }}
                   />
                 ),

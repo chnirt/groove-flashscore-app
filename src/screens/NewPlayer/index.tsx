@@ -79,7 +79,6 @@ const NewMatch = () => {
         })
 
         return
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Toast.show({
           icon: 'error',
@@ -90,20 +89,6 @@ const NewMatch = () => {
       }
     },
     [user, teamId, navigate, isEditMode, playerDocRefState]
-  )
-
-  const fetchPlayerById = useCallback(
-    async (playerId: string) => {
-      const playerDocRef = getDocRef('players', playerId)
-      setPlayerDocRefState(playerDocRef)
-      const playerDocData: any = await getDocument(playerDocRef)
-      form.setFieldsValue({
-        ...playerDocData,
-        playerName: playerDocData.name,
-        playerAvatar: playerDocData.avatar,
-      })
-    },
-    [form]
   )
 
   const removePlayer = useCallback(async () => {
@@ -123,9 +108,23 @@ const NewMatch = () => {
     })
   }, [playerDocRefState, navigate])
 
+  const fetchPlayerById = useCallback(
+    async (playerId: string) => {
+      const playerDocRef = getDocRef('players', playerId)
+      setPlayerDocRefState(playerDocRef)
+      const playerDocData: any = await getDocument(playerDocRef)
+      form.setFieldsValue({
+        ...playerDocData,
+        playerName: playerDocData.name,
+        playerAvatar: playerDocData.avatar,
+      })
+    },
+    [form]
+  )
+
   useEffect(() => {
     if (playerId === undefined || typeof fetchPlayerById !== 'function') return
-    const handleFetchTeam = async () => {
+    const handleFetchPlayer = async () => {
       try {
         await fetchPlayerById(playerId)
         // do something
@@ -134,7 +133,7 @@ const NewMatch = () => {
       }
     }
 
-    handleFetchTeam()
+    handleFetchPlayer()
   }, [playerId, fetchPlayerById, navigate])
 
   return (
