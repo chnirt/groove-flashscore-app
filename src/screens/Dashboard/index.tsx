@@ -115,7 +115,8 @@ const Dashboard = () => {
       >
         <button className="bg-transparent">
           <img className="h-8" src={Logo} />
-          {/* <p className="text-lg text-black2">GROOVE LEAGUE 2023</p> */}
+          {/* <p classNa
+          me="text-lg text-black2">GROOVE LEAGUE 2023</p> */}
         </button>
       </NavBar>
 

@@ -10,11 +10,13 @@ import MatchButton from './components/MatchButton'
 import useAuth from '../../hooks/useAuth'
 import Stat from './components/Stat'
 import LineUp from './components/LineUp'
+import useFlashScore from '../../context/FlashScore/useFlashScore'
 
 const Match = () => {
   const { matchId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { fetchTeam, fetchMatch } = useFlashScore()
   const [match, setMatch] = useState<any | undefined>()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
   const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
@@ -35,14 +37,16 @@ const Match = () => {
       try {
         if (matchId === undefined) return
         if (typeof fetchMatchById !== 'function') return
-        await fetchMatchById(matchId)
+        if (typeof fetchTeam !== 'function') return
+        if (typeof fetchMatch !== 'function') return
+        await Promise.all([fetchTeam(), fetchMatch(), fetchMatchById(matchId)])
       } catch (e) {
         navigate(routes.error)
       }
     }
 
     handleFetchMatch()
-  }, [matchId, fetchMatchById, navigate])
+  }, [matchId, fetchMatchById, fetchTeam, fetchMatch, navigate])
 
   const renderTabContent = useCallback(() => {
     switch (selectedIndex) {
