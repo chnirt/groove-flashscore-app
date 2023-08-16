@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
+import useAuth from '../../hooks/useAuth'
 
 type FlashScoreType = {
   teams?: any[]
@@ -26,6 +27,7 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { user } = useAuth()
   const [teams, setTeams] = useState<any[] | undefined>()
   const [matches, setMatches] = useState<any[] | undefined>()
   const [players, setPlayers] = useState<any[] | undefined>()
@@ -60,21 +62,25 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const matchColGroupRef = getColRef('matches')
       const q = query(matchColGroupRef, orderBy('playDate', 'asc'))
+
       querySnapshot = await getDocs(q)
-      const matchDocs = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
+      const matchDocs = querySnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter((doc: any) => (user ? doc : !doc.hidden))
       setMatches(matchDocs)
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [user])
 
   const fetchMatch = useCallback(async () => {
-    if (matches?.length) return
+    // if (matches?.length) return
     await refetchMatch()
-  }, [matches, refetchMatch])
+    // }, [matches, refetchMatch])
+  }, [refetchMatch])
 
   const refetchPlayer = useCallback(async () => {
     try {

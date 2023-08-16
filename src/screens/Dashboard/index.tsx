@@ -35,9 +35,14 @@ const Dashboard = () => {
     return result
   }, [matches, selectedIndex, formattedTeams])
   const myLiveMatches = useMemo(() => {
-    const result = filteredMatches?.filter((match) =>
-      moment(match.playDate.toDate()).isSameOrBefore(moment())
-    )
+    const result = filteredMatches?.filter((match) => {
+      const playDate = moment(match.playDate.toDate())
+      const now = moment()
+      return (
+        moment(match.playDate.toDate()).isSameOrBefore(moment()) &&
+        now.diff(playDate, 'minutes') <= 60
+      )
+    })
     return result
   }, [filteredMatches])
   const myUpcomingMatches = useMemo(() => {
@@ -46,12 +51,18 @@ const Dashboard = () => {
     )
     return result
   }, [filteredMatches])
-  // const myMatchResult = useMemo(() => {
-  //   const result = filteredMatches?.filter((match) =>
-  //     moment(match.playDate.toDate()).isAfter(moment())
-  //   )
-  //   return result
-  // }, [filteredMatches])
+
+  const myMatchResult = useMemo(() => {
+    const result = filteredMatches?.filter((match) => {
+      const playDate = moment(match.playDate.toDate())
+      const now = moment()
+      return (
+        moment(match.playDate.toDate()).isSameOrBefore(moment()) &&
+        now.diff(playDate, 'minutes') > 60
+      )
+    })
+    return result
+  }, [filteredMatches])
 
   const navigateMatch = useCallback(
     (match: MatchType) => {
@@ -215,27 +226,37 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* <div className="flex flex-col gap-8">
-            <div className="flex items-center justify-between px-4">
-              <h2 className="m-0 text-lg font-bold text-gray1">
-                Match Results
-              </h2>
+          {myMatchResult?.length === undefined ? (
+            <div className="flex flex-col gap-8">
+              <div className="px-4">
+                <Skeleton.Title className="!mb-0 !mt-0 h-7" />
+              </div>
+              <div className="flex flex-col gap-4 px-4">
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+                <Skeleton animated className="h-[76px] w-full rounded-3xl" />
+              </div>
             </div>
-            <div className="flex flex-col gap-4 px-4">
-              {myMatchResult?.length === undefined ? (
-                <div>Loading</div>
-              ) : myMatchResult.length === 0 ? null : (
-                myMatchResult.map((match, mi: number) => (
+          ) : myMatchResult.length === 0 ? null : (
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between px-4">
+                <h2 className="m-0 text-lg font-bold text-gray1">
+                  Match Results
+                </h2>
+              </div>
+              <div className="flex flex-col gap-4 px-4">
+                {myMatchResult.map((match, mi: number) => (
                   <MatchCard
                     key={`match-${mi}`}
                     match={match}
                     onClick={() => navigateMatch(match)}
                     completed
                   />
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div> */}
+          )}
         </div>
       </PullToRefresh>
     </div>

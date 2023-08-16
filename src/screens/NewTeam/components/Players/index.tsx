@@ -77,7 +77,7 @@ const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
           {filterPlayers.map((player, pi: number) => {
             const avatar = player?.avatar?.[0]?.url ?? ''
             const team = teams?.find((team) => team.id === player.teamId)
-            const teamLogo = team.logo[0]?.url
+            const teamLogo = team?.logo?.[0]?.url
             return (
               <List.Item
                 key={`player-${pi}`}
@@ -96,7 +96,9 @@ const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
                 }
                 arrow={
                   <div className="flex items-center">
-                    {player?.goalkeeper ? 'Goalkeeper' : null}
+                    {player?.goalkeeper ? (
+                      <div className="mr-2">Goalkeeper</div>
+                    ) : null}
                     <img className="h-10 w-10 object-contain" src={teamLogo} />
                   </div>
                 }

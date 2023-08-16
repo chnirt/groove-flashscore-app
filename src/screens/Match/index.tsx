@@ -1,5 +1,5 @@
 import { NavBar, Skeleton } from 'antd-mobile'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
 import { DocumentData, DocumentReference } from 'firebase/firestore'
@@ -36,9 +36,9 @@ const Match = () => {
     const handleFetchMatch = async () => {
       try {
         if (matchId === undefined) return
-        if (typeof fetchMatchById !== 'function') return
         if (typeof fetchTeam !== 'function') return
         if (typeof fetchMatch !== 'function') return
+        if (typeof fetchMatchById !== 'function') return
         await Promise.all([fetchTeam(), fetchMatch(), fetchMatchById(matchId)])
       } catch (e) {
         navigate(routes.error)
@@ -96,7 +96,16 @@ const Match = () => {
         backArrow={false}
         right={
           user ? (
-            <button className="h-10 w-10 rotate-90 rounded-2xl bg-white p-2">
+            <button
+              className="h-10 w-10 rounded-2xl bg-white p-2"
+              onClick={() =>
+                navigate(
+                  generatePath(routes.editMatch, {
+                    matchId,
+                  })
+                )
+              }
+            >
               <GoKebabHorizontal className="h-6 w-6 text-black2" />
             </button>
           ) : null

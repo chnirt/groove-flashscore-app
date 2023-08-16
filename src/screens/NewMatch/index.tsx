@@ -5,34 +5,78 @@ import {
   Form,
   Input,
   NavBar,
+  Switch,
   Toast,
 } from 'antd-mobile'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import dayjs from 'dayjs'
 import { Select } from 'antd'
-import { RefObject, useCallback } from 'react'
-import { Timestamp } from 'firebase/firestore'
+import { RefObject, useCallback, useEffect, useState } from 'react'
+import { DocumentData, DocumentReference, Timestamp } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { MASTER_MOCK_DATA } from '../../mocks'
-import { addDocument, getColRef } from '../../firebase/service'
+import {
+  addDocument,
+  getColRef,
+  getDocRef,
+  getDocument,
+  updateDocument,
+} from '../../firebase/service'
 import { Loading } from '../../global'
+import { routes } from '../../routes'
 
 const initialValues = MASTER_MOCK_DATA.NEW_MATCH
 
 const NewMatch = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
+  const { matchId } = useParams()
+  const isEditMode = matchId
   const { user } = useAuth()
-  const { teams, refetchMatch } = useFlashScore()
+  const { teams, fetchTeam, fetchMatch, refetchMatch } = useFlashScore()
+  const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
+    DocumentData,
+    DocumentData
+  > | null>(null)
+
+  const fetchMatchById = useCallback(
+    async (matchId: string) => {
+      if (matchId === undefined) return
+      const matchDocRef = getDocRef('matches', matchId)
+      setMatchDocRefState(matchDocRef)
+      const matchDocData: any = await getDocument(matchDocRef)
+      form.setFieldsValue({
+        ...matchDocData,
+        playDate: matchDocData.playDate.toDate(),
+      })
+    },
+    [form]
+  )
+
+  useEffect(() => {
+    const handleFetchMatch = async () => {
+      try {
+        if (matchId === undefined) return
+        if (typeof fetchTeam !== 'function') return
+        if (typeof fetchMatch !== 'function') return
+        if (typeof fetchMatchById !== 'function') return
+        await Promise.all([fetchTeam(), fetchMatch(), fetchMatchById(matchId)])
+      } catch (e) {
+        navigate(routes.error)
+      }
+    }
+
+    handleFetchMatch()
+  }, [matchId, fetchTeam, fetchMatch, fetchMatchById, navigate])
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (user === null) return
       try {
         Loading.get.show()
-        const { groupStage, homeTeamId, awayTeamId, playDate } = values
+        const { groupStage, homeTeamId, awayTeamId, playDate, hidden } = values
         if (playDate === null) return
         const uid = user.uid
         const matchData = {
@@ -40,11 +84,17 @@ const NewMatch = () => {
           homeTeamId,
           awayTeamId,
           playDate: Timestamp.fromDate(playDate),
+          hidden,
           uid,
         }
 
-        const matchDocRef = getColRef('matches')
-        await addDocument(matchDocRef, matchData)
+        if (isEditMode) {
+          if (matchDocRefState === null) return
+          await updateDocument(matchDocRefState, matchData)
+        } else {
+          const matchDocRef = getColRef('matches')
+          await addDocument(matchDocRef, matchData)
+        }
 
         if (typeof refetchMatch === 'function') {
           await refetchMatch()
@@ -53,7 +103,7 @@ const NewMatch = () => {
         navigate(-1)
         Toast.show({
           icon: 'success',
-          content: 'Added',
+          content: isEditMode ? 'Saved' : 'Added',
         })
 
         return
@@ -67,7 +117,7 @@ const NewMatch = () => {
         Loading.get.hide()
       }
     },
-    [user, navigate, refetchMatch]
+    [user, navigate, refetchMatch, isEditMode, matchDocRefState]
   )
 
   return (
@@ -84,7 +134,7 @@ const NewMatch = () => {
         }
         backArrow={false}
       >
-        New Match
+        {isEditMode ? 'Edit Team' : 'New Team'}
       </NavBar>
 
       <Form
@@ -101,11 +151,11 @@ const NewMatch = () => {
             size="large"
             shape="rounded"
           >
-            Add
+            {isEditMode ? 'Save' : 'Add'}
           </Button>
         }
       >
-        <Form.Header>New Team</Form.Header>
+        <Form.Header>{isEditMode ? 'Edit Match' : 'New Match'}</Form.Header>
         <Form.Item
           name="groupStage"
           label="Group Stage"
@@ -196,6 +246,15 @@ const NewMatch = () => {
               value ? dayjs(value).format('YYYY-MM-DD') : 'Select a time'
             }
           </DatePicker>
+        </Form.Item>
+
+        <Form.Item
+          name="hidden"
+          label="Hidden"
+          childElementPosition="right"
+          valuePropName="checked"
+        >
+          <Switch />
         </Form.Item>
       </Form>
     </div>

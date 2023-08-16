@@ -17,6 +17,7 @@ export const routes = {
   editPlayer: '/teams/:teamId/players/:playerId',
   newMatch: '/newMatch',
   match: '/matches/:matchId',
+  editMatch: '/matches/:matchId/edit',
   rules: '/rules',
   ranking: '/ranking',
 
@@ -135,6 +136,16 @@ export const router = createBrowserRouter([
               },
               {
                 path: routes.newMatch,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/NewMatch'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.editMatch,
                 element: (
                   <Loadable
                     {...{

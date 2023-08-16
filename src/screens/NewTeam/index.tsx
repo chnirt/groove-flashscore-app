@@ -169,7 +169,7 @@ const NewTeam = () => {
             </Button>
           }
         >
-          <Form.Header>New Team</Form.Header>
+          <Form.Header>{isEditMode ? 'Edit Team' : 'New Team'}</Form.Header>
           <Form.Item
             name="teamName"
             label="Team Name"
