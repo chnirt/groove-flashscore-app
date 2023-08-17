@@ -39,7 +39,7 @@ export const auth = getAuth(app)
 // Create a root reference
 export const storage = getStorage()
 
-if (IS_DEVELOP) {
+if (!IS_DEVELOP) {
   const AUTH_PORT = 9099
   const FIRESTORE_PORT = 8080
   const STORAGE_PORT = 9199

@@ -48,17 +48,33 @@ const Ranking = () => {
       case 0: {
         if (teams === undefined)
           return <Skeleton animated className="h-screen w-full rounded-3xl" />
-        return <TeamsRanking rows={teams.sort((a, b) => b.points - a.points)} />
+        return (
+          <TeamsRanking
+            rows={teams.sort((a, b) =>
+              b.points - a.points === 0
+                ? b.goalDifference - a.goalDifference
+                : b.points - a.points
+            )}
+          />
+        )
       }
       case 1: {
         if (goalscorers === undefined)
           return <Skeleton animated className="h-screen w-full rounded-3xl" />
-        return <PlayersRanking rows={goalscorers.sort((a, b) => b.points - a.points)} />
+        return (
+          <PlayersRanking
+            rows={goalscorers.sort((a, b) => b.points - a.points)}
+          />
+        )
       }
       case 2: {
         if (goalscorers === undefined)
           return <Skeleton animated className="h-screen w-full rounded-3xl" />
-        return <PlayersRanking rows={goalkeepers.sort((a, b) => b.points - a.points)} />
+        return (
+          <PlayersRanking
+            rows={goalkeepers.sort((a, b) => b.points - a.points)}
+          />
+        )
       }
       default:
         return null

@@ -27,7 +27,7 @@ const NewStat = () => {
   const { matchId, statId } = useParams()
   const isEditMode = statId
   const { user } = useAuth()
-  const { matches, players, refetchStat } = useFlashScore()
+  const { matches, players, refetchMatch, refetchStat } = useFlashScore()
   const [statDocRefState, setStatDocRefState] = useState<DocumentReference<
     DocumentData,
     DocumentData
@@ -77,8 +77,11 @@ const NewStat = () => {
           await addDocument(statsDocRef, statData)
         }
 
-        if (typeof refetchStat === 'function') {
-          await refetchStat()
+        if (
+          typeof refetchMatch === 'function' &&
+          typeof refetchStat === 'function'
+        ) {
+          await Promise.all([refetchMatch(), refetchStat()])
         }
 
         navigate(-2)
