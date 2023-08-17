@@ -34,7 +34,7 @@ export const AuthContext = createContext<AuthContextType>({
 })
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  console.log('authProvider')
+  // console.log('authProvider')
   const [user, setUser] = useState<IUser | null>(null)
   const [status, setStatus] = useState<AuthStatus>(AuthStatus.loading)
   const [userDocReference, setUserDocReference] = useState<DocumentReference<

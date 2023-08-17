@@ -5,6 +5,7 @@ import { IS_DEVELOP, eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { routes } from '../../routes'
+import { useEffectOnce } from 'react-use'
 
 const Home = () => {
   const location = useLocation()
@@ -29,19 +30,19 @@ const Home = () => {
     scrollToTop()
   }, [location, scrollToTop])
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const handleFetchTeam = async () => {
       try {
         if (typeof fetchTeam !== 'function') return
         if (typeof fetchMatch !== 'function') return
         if (typeof fetchPlayer !== 'function') return
         if (typeof fetchStat !== 'function') return
-        // await Promise.all([
-        // fetchTeam(),
-        // fetchMatch(),
-        // fetchPlayer(),
-        // fetchStat(),
-        // ])
+        await Promise.all([
+          fetchTeam(),
+          fetchMatch(),
+          fetchPlayer(),
+          fetchStat(),
+        ])
         // do something
       } catch (e) {
         navigate(routes.error)
@@ -49,7 +50,7 @@ const Home = () => {
     }
 
     handleFetchTeam()
-  }, [fetchTeam, fetchMatch, fetchPlayer, fetchStat, navigate])
+  })
   return (
     <div className="min-h-screen bg-black1">
       <Outlet context={auth} />
