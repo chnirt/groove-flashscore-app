@@ -5,7 +5,11 @@ import { Button, NavBar, Skeleton, Toast } from 'antd-mobile'
 import 'easymde/dist/easymde.min.css'
 import useAuth from '../../hooks/useAuth'
 import { Loading } from '../../global'
-import { getDocRef, getDocument, updateDocument } from '../../firebase/service'
+import {
+  getDocRef,
+  // getDocument,
+  updateDocument,
+} from '../../firebase/service'
 // import { routes } from '../../routes'
 import { useNavigate } from 'react-router-dom'
 
