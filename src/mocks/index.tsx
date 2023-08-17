@@ -46,6 +46,7 @@ export const MASTER_MOCK_DATA = {
     homeTeamId: '',
     awayTeamId: '',
     playDate: IS_DEVELOP ? new Date() : null,
+    time: [],
     hidden: false,
   },
   NEW_PLAYER: {

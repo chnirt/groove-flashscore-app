@@ -5,7 +5,8 @@ import {
   Form,
   Input,
   NavBar,
-  // Picker,
+  Picker,
+  PickerRef,
   Switch,
   Toast,
 } from 'antd-mobile'
@@ -28,6 +29,7 @@ import {
 import { Loading } from '../../global'
 import { routes } from '../../routes'
 import Stats from './components/Stats'
+import moment from 'moment'
 
 const initialValues = MASTER_MOCK_DATA.NEW_MATCH
 
@@ -37,7 +39,7 @@ const NewMatch = () => {
   const { matchId } = useParams()
   const isEditMode = matchId
   const { user } = useAuth()
-  const { teams, fetchTeam, fetchMatch, refetchMatch } = useFlashScore()
+  const { teams, refetchMatch } = useFlashScore()
   const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
     DocumentData,
     DocumentData
@@ -49,9 +51,12 @@ const NewMatch = () => {
       const matchDocRef = getDocRef('matches', matchId)
       setMatchDocRefState(matchDocRef)
       const matchDocData: any = await getDocument(matchDocRef)
+      const hours = moment(matchDocData.playDate.toDate()).hours()
+      const minutes = moment(matchDocData.playDate.toDate()).minutes()
       form.setFieldsValue({
         ...matchDocData,
         playDate: matchDocData.playDate.toDate(),
+        time: [hours, minutes],
       })
     },
     [form]
@@ -61,25 +66,34 @@ const NewMatch = () => {
     const handleFetchMatch = async () => {
       try {
         if (matchId === undefined) return
-        if (typeof fetchTeam !== 'function') return
-        if (typeof fetchMatch !== 'function') return
         if (typeof fetchMatchById !== 'function') return
-        await Promise.all([fetchTeam(), fetchMatch(), fetchMatchById(matchId)])
+        await Promise.all([fetchMatchById(matchId)])
       } catch (e) {
         navigate(routes.error)
       }
     }
 
     handleFetchMatch()
-  }, [matchId, fetchTeam, fetchMatch, fetchMatchById, navigate])
+  }, [matchId, fetchMatchById, navigate])
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (user === null) return
       try {
         Loading.get.show()
-        const { groupStage, homeTeamId, awayTeamId, playDate, hidden } = values
+        const {
+          groupStage,
+          homeTeamId,
+          awayTeamId,
+          playDate,
+          time,
+          hidden,
+        }: any = values
         if (playDate === null) return
+        if (time.length > 0) {
+          playDate.setHours(time[0])
+          playDate.setMinutes(time[1])
+        }
         const uid = user.uid
         const matchData = {
           groupStage,
@@ -109,7 +123,6 @@ const NewMatch = () => {
         })
 
         return
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Toast.show({
           icon: 'error',
@@ -258,9 +271,47 @@ const NewMatch = () => {
         >
           <DatePicker>
             {(value) =>
-              value ? dayjs(value).format('YYYY-MM-DD') : 'Select a time'
+              value ? dayjs(value).format('YYYY-MM-DD') : 'Select a date'
             }
           </DatePicker>
+        </Form.Item>
+
+        <Form.Item
+          name="time"
+          label="Time"
+          rules={[
+            {
+              required: true,
+              message: 'Time is required',
+            },
+          ]}
+          trigger="onConfirm"
+          onClick={(_, pickerRef: RefObject<PickerRef>) => {
+            pickerRef.current?.open()
+          }}
+        >
+          <Picker
+            columns={[
+              Array(24)
+                .fill(null)
+                .map((_, hour) => ({
+                  label: hour < 9 ? `0${hour}` : hour,
+                  value: hour,
+                })),
+              Array(60)
+                .fill(null)
+                .map((_, hour) => ({
+                  label: hour < 9 ? `0${hour}` : hour,
+                  value: hour,
+                })),
+            ]}
+          >
+            {(value) =>
+              value
+                ? value.map((value) => value?.label).join(':')
+                : 'Select a time'
+            }
+          </Picker>
         </Form.Item>
 
         <Form.Item
