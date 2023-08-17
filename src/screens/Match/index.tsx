@@ -1,4 +1,4 @@
-import { NavBar, Skeleton } from 'antd-mobile'
+import { Button, Dialog, NavBar, Skeleton, Toast } from 'antd-mobile'
 import { generatePath, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useMemo, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
@@ -9,17 +9,40 @@ import useAuth from '../../hooks/useAuth'
 import Stat from './components/Stat'
 import LineUp from './components/LineUp'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
+import { getDocRef } from '../../firebase/service'
+import { deleteDoc } from 'firebase/firestore'
 
 const Match = () => {
   const { matchId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { matches, stats } = useFlashScore()
+  const { matches, stats, refetchMatch } = useFlashScore()
   const myMatch = useMemo(
     () => matches?.find((match) => match.id === matchId),
     [matches, matchId]
   )
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+
+  const removeMatch = useCallback(async () => {
+    await Dialog.confirm({
+      content: 'Are you sure want to delete?',
+      cancelText: 'Cancel',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        if (matchId === undefined) return
+        const matchDocRef = getDocRef('matches', matchId)
+        await deleteDoc(matchDocRef)
+        if (typeof refetchMatch === 'function') {
+          await refetchMatch()
+        }
+        navigate(-1)
+        Toast.show({
+          icon: 'success',
+          content: 'Deleted',
+        })
+      },
+    })
+  }, [matchId, navigate, refetchMatch])
 
   const renderTabContent = useCallback(() => {
     const homeYellowCards =
@@ -132,6 +155,20 @@ const Match = () => {
           <div className="flex flex-col gap-3">{renderTabContent()}</div>
         </div>
       </div>
+
+      {user ? (
+        <Button
+          color="primary"
+          fill="none"
+          block
+          type="submit"
+          size="large"
+          shape="rounded"
+          onClick={removeMatch}
+        >
+          Remove
+        </Button>
+      ) : null}
     </div>
   )
 }

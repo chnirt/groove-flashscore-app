@@ -1,4 +1,4 @@
-// import moment from 'moment'
+import moment from 'moment'
 import { twMerge } from 'tailwind-merge'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 import { LiveMatchCardProps } from '../LiveMatchCard'
@@ -17,10 +17,11 @@ const MatchCard = ({
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0]?.url
-  // const time =  moment(match.playDate.toDate()).format('HH:mm')
-  const time = ''
-  // const date = moment(match.playDate.toDate()).format('DD MMM').toUpperCase()
-  const date = ''
+  const playDate = new Date(
+    match.playDate.seconds * 1000 + match.playDate.nanoseconds / 1000000
+  )
+  const time = moment(playDate).format('HH:mm')
+  const date = moment(playDate).format('DD MMM').toUpperCase()
   return (
     <button
       className={twMerge(

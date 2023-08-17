@@ -1,5 +1,5 @@
 import { twMerge } from 'tailwind-merge'
-// import moment from 'moment'
+import moment from 'moment'
 import { Timestamp } from 'firebase/firestore'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 import { MATCH_TIMING } from '../../../../constants'
@@ -39,13 +39,11 @@ const LiveMatchCard = ({
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0]?.url
-  const week = `Week`
-  // const week = `Week ${moment(match.playDate?.toDate())?.week()}`
-  // const time = moment
-  //   .duration(moment().diff(match.playDate?.toDate()))
-  //   .asMinutes()
-  //   .valueOf()
-  const time = 99
+  const playDate = new Date(
+    match.playDate.seconds * 1000 + match.playDate.nanoseconds / 1000000
+  )
+  const week = `Week ${moment(playDate)?.week()}`
+  const time = moment.duration(moment().diff(playDate)).asMinutes().valueOf()
   const timeDisplay =
     time > MATCH_TIMING
       ? 'Overtime'
