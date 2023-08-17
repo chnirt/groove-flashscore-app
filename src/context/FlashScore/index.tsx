@@ -33,6 +33,7 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
+  console.log('flasScoreProvider')
   const [teams, setTeams] = useLocalStorage<any[] | undefined>('teams')
   const [matches, setMatches] = useLocalStorage<any[] | undefined>('matchs')
   const [players, setPlayers] = useLocalStorage<any[] | undefined>('players')
@@ -100,7 +101,8 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (error) {
       console.error(error)
     }
-  }, [matches])
+    // }, [matches])
+  }, [])
 
   const fetchTeam = useCallback(async () => {
     if (teams?.length) return
@@ -190,7 +192,8 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (error) {
       console.error(error)
     }
-  }, [stats])
+    // }, [stats])
+  }, [])
 
   const fetchMatch = useCallback(async () => {
     if (matches?.length) return
@@ -228,7 +231,8 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (error) {
       console.error(error)
     }
-  }, [matches, stats])
+    // }, [matches, stats])
+  }, [])
 
   const fetchPlayer = useCallback(async () => {
     if (players?.length) return
