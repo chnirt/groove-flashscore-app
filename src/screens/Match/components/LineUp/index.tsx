@@ -128,7 +128,7 @@ const LineUp = ({ match }: { match: any }) => {
                     .getFieldValue('lineUpFile')
                     .filter((file: any) => Boolean(file))
                   if (!Array.isArray(lineUpFile)) return
-                  form.setFieldsValue({ lineUpFile: lineUpFile[0].url })
+                  form.setFieldsValue({ lineUpFile: lineUpFile[0]?.url })
                   return
                 }
                 return

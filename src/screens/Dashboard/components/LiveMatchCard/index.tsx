@@ -35,10 +35,10 @@ const LiveMatchCard = ({
   const groupStage = match.groupStage
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
   const homeName = homeTeam.name
-  const homeTeamLogo = homeTeam.logo[0].url
+  const homeTeamLogo = homeTeam.logo[0]?.url
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
-  const awayTeamLogo = awayTeam.logo[0].url
+  const awayTeamLogo = awayTeam.logo[0]?.url
   const week = `Week`
   // const week = `Week ${moment(match.playDate?.toDate())?.week()}`
   // const time = moment

@@ -13,12 +13,14 @@ const MatchCard = ({
   if (teams?.length === 0) return null
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
   const homeName = homeTeam.name
-  const homeTeamLogo = homeTeam.logo[0].url
+  const homeTeamLogo = homeTeam.logo[0]?.url
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
-  const awayTeamLogo = awayTeam.logo[0].url
-  const time = moment(match.playDate.toDate()).format('HH:mm')
-  const date = moment(match.playDate.toDate()).format('DD MMM').toUpperCase()
+  const awayTeamLogo = awayTeam.logo[0]?.url
+  // const time =  moment(match.playDate.toDate()).format('HH:mm')
+  const time = ''
+  // const date = moment(match.playDate.toDate()).format('DD MMM').toUpperCase()
+  const date = ''
   return (
     <button
       className={twMerge(
