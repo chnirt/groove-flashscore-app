@@ -188,7 +188,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           awayRanking,
         }
       })
-      // setMatches(matchDocs)
+      setMatches(matchDocs)
     } catch (error) {
       console.error(error)
     }
