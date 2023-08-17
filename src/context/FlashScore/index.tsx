@@ -3,9 +3,9 @@ import {
   PropsWithChildren,
   createContext,
   useCallback,
-  useEffect,
+  // useEffect,
   useMemo,
-  useState,
+  // useState,
 } from 'react'
 import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
@@ -33,7 +33,7 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  console.log('flasScoreProvider')
+  console.log('flashScoreProvider')
   const [teams, setTeams] = useLocalStorage<any[] | undefined>('teams')
   const [matches, setMatches] = useLocalStorage<any[] | undefined>('matchs')
   const [players, setPlayers] = useLocalStorage<any[] | undefined>('players')
