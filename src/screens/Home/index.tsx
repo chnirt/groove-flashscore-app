@@ -36,11 +36,11 @@ const Home = () => {
         if (typeof fetchMatch !== 'function') return
         if (typeof fetchPlayer !== 'function') return
         if (typeof fetchStat !== 'function') return
-        await Promise.allSettled([
+        await Promise.all([
           fetchTeam(),
-          fetchMatch(),
-          fetchPlayer(),
-          fetchStat(),
+          // fetchMatch(),
+          // fetchPlayer(),
+          // fetchStat(),
         ])
         // do something
       } catch (e) {
