@@ -5,6 +5,7 @@ import {
   useCallback,
   // useEffect,
   useMemo,
+  useState,
 } from 'react'
 import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
@@ -32,14 +33,24 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  // console.log('flashScoreProvider')
-  const [teams, setTeams] = useLocalStorage<any[] | undefined>('teams')
-  const [matches, setMatches] = useLocalStorage<any[] | undefined>('matchs')
-  const [players, setPlayers] = useLocalStorage<any[] | undefined>('players')
-  const [stats, setStats] = useLocalStorage<any[] | undefined>('stats')
+  console.log('flashScoreProvider')
+  const [teams, setTeams, removeTeams] = useLocalStorage<any[] | undefined>(
+    'teams'
+  )
+  // const [matches, setMatches, removeMatches] = useLocalStorage<
+  //   any[] | undefined
+  // >('matches')
+  const [matches, setMatches] = useState<any[] | undefined>()
+  const [players, setPlayers, removePlayers] = useLocalStorage<
+    any[] | undefined
+  >('players')
+  // const [stats, setStats, removeStats] = useLocalStorage<any[] | undefined>(
+  //   'stats'
+  // )
+  const [stats, setStats] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
-    // console.log('refetchTeam')
+    console.log('refetchTeam')
     try {
       const teamColGroupRef = getColRef('teams')
       const q = query(teamColGroupRef)
@@ -97,6 +108,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           points: points ?? 0,
         }
       })
+      removeTeams()
       setTeams(teamDocs)
     } catch (error) {
       console.error(error)
@@ -109,7 +121,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [teams, refetchTeam])
 
   const refetchMatch = useCallback(async () => {
-    // console.log('refetchMatch')
+    console.log('refetchMatch')
     try {
       const matchColGroupRef = getColRef('matches')
       const q = query(matchColGroupRef, orderBy('playDate', 'asc'))
@@ -125,7 +137,6 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         const isResult =
           playDate.isSameOrBefore(moment()) &&
           moment().diff(playDate, 'minutes') > MATCH_TIMING
-
         const homeTeamId = data?.homeTeamId
         const awayTeamId = data?.awayTeamId
         const homeGoals =
@@ -200,7 +211,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [matches, refetchMatch])
 
   const refetchPlayer = useCallback(async () => {
-    // console.log('refetchPlayer')
+    console.log('refetchPlayer')
     try {
       const playerColGroupRef = getColRef('players')
       const q = query(playerColGroupRef)
@@ -214,9 +225,11 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
             match.matchType === 'RESULT' &&
             [match.homeTeamId, match.awayTeamId].includes(teamId)
         )
-        const goalkeeperPoints = matchResult?.map((match) =>
-          match.homeTeamId === teamId ? -match?.awayGoals : -match?.homeGoals
-        )
+        const goalkeeperPoints = matchResult
+          ?.map((match) =>
+            match.homeTeamId === teamId ? -match?.awayGoals : -match?.homeGoals
+          )
+          .reduce((a, b) => a + b, 0)
         const points = stats?.filter(
           (stat) => stat.statId === 'GOAL' && stat.playerId === doc.id
         ).length
@@ -227,6 +240,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           points: isGoalKeeper ? goalkeeperPoints : points ?? 0,
         }
       })
+      removePlayers()
       setPlayers(playerDocs)
     } catch (error) {
       console.error(error)
@@ -239,20 +253,26 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [players, refetchPlayer])
 
   const refetchStat = useCallback(async () => {
-    // console.log('refetchStat')
+    console.log('refetchStat')
     try {
       const statColGroupRef = getColRef('stats')
       const q = query(statColGroupRef)
       querySnapshot = await getDocs(q)
       const statDocs = querySnapshot.docs.map((doc) => ({
         id: doc.id,
+        ref: doc.ref,
         ...doc.data(),
       }))
-      setStats(statDocs)
+      const matchIdList = matches?.map((match) => match.id)
+      const newStats = statDocs.filter(
+        (statDoc: any) => matchIdList?.includes(statDoc?.matchId)
+      )
+      console.log(newStats)
+      setStats(newStats)
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [matches])
 
   const fetchStat = useCallback(async () => {
     if (stats !== undefined) return

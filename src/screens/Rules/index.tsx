@@ -135,8 +135,6 @@ const Rules = () => {
     handleFetchRules()
   }, [fetchRules, navigate])
 
-  console.log()
-
   return (
     <div>
       <NavBar className="sticky top-0 z-10 bg-bgPrimary" backArrow={false}>

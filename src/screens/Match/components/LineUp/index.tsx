@@ -250,7 +250,7 @@ const LineUp = ({ match }: { match: any }) => {
     )
 
   return (
-    <img className="rounded-2xl object-contain" src={match?.file[0]?.url} />
+    <img className="rounded-2xl object-contain" src={match?.file?.[0]?.url} />
   )
 }
 

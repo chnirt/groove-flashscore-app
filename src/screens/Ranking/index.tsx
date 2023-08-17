@@ -9,8 +9,16 @@ import PlayersRanking from './components/PlayersRanking'
 
 const Ranking = () => {
   const navigate = useNavigate()
-  const { teams, fetchTeam, refetchTeam, players, fetchPlayer, refetchPlayer } =
-    useFlashScore()
+  const {
+    teams,
+    fetchTeam,
+    refetchTeam,
+    players,
+    fetchPlayer,
+    refetchPlayer,
+    refetchMatch,
+    refetchStat,
+  } = useFlashScore()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
   const goalscorers = useMemo(
     () => players?.filter((player) => !player?.goalkeeper),
@@ -23,10 +31,16 @@ const Ranking = () => {
 
   const onRefresh = useCallback(async () => {
     if (refetchTeam === undefined) return
+    if (refetchMatch === undefined) return
     if (refetchPlayer === undefined) return
-    refetchTeam()
-    refetchPlayer()
-  }, [refetchTeam, refetchPlayer])
+    if (refetchStat === undefined) return
+    await Promise.all([
+      refetchTeam(),
+      refetchMatch(),
+      refetchPlayer(),
+      refetchStat(),
+    ])
+  }, [refetchTeam, refetchMatch, refetchPlayer, refetchStat])
 
   useEffect(() => {
     const handleFetchTeam = async () => {
