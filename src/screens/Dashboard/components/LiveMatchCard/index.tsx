@@ -39,11 +39,13 @@ const LiveMatchCard = ({
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
   const awayTeamName = awayTeam.name
   const awayTeamLogo = awayTeam.logo[0].url
-  const week = `Week ${moment(match.playDate.toDate()).week()}`
-  const time = moment
-    .duration(moment().diff(match.playDate.toDate()))
-    .asMinutes()
-    .valueOf()
+  const week = `Week`
+  // const week = `Week ${moment(match.playDate?.toDate())?.week()}`
+  // const time = moment
+  //   .duration(moment().diff(match.playDate?.toDate()))
+  //   .asMinutes()
+  //   .valueOf()
+  const time = 99
   const timeDisplay =
     time > MATCH_TIMING
       ? 'Overtime'

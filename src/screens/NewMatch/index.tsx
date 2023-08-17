@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   NavBar,
+  Picker,
   Switch,
   Toast,
 } from 'antd-mobile'
