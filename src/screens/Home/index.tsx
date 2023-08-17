@@ -37,7 +37,7 @@ const Home = () => {
         if (typeof fetchPlayer !== 'function') return
         if (typeof fetchStat !== 'function') return
         await Promise.all([
-          fetchTeam(),
+          // fetchTeam(),
           // fetchMatch(),
           // fetchPlayer(),
           // fetchStat(),

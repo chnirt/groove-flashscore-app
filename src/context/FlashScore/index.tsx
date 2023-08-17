@@ -188,7 +188,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           awayRanking,
         }
       })
-      setMatches(matchDocs)
+      // setMatches(matchDocs)
     } catch (error) {
       console.error(error)
     }
@@ -196,6 +196,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [])
 
   const fetchMatch = useCallback(async () => {
+    console.log(matches?.length)
     if (matches?.length) return
     await refetchMatch()
   }, [matches, refetchMatch])
