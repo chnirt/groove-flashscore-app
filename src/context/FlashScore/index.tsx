@@ -11,6 +11,7 @@ import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
 import moment from 'moment'
 import { MATCH_TIMING } from '../../constants'
+import { useLocalStorage } from 'react-use'
 
 type FlashScoreType = {
   teams?: any[]
@@ -32,10 +33,10 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [teams, setTeams] = useState<any[] | undefined>()
-  const [matches, setMatches] = useState<any[] | undefined>()
-  const [players, setPlayers] = useState<any[] | undefined>()
-  const [stats, setStats] = useState<any[] | undefined>()
+  const [teams, setTeams] = useLocalStorage<any[] | undefined>('teams')
+  const [matches, setMatches] = useLocalStorage<any[] | undefined>('matchs')
+  const [players, setPlayers] = useLocalStorage<any[] | undefined>('players')
+  const [stats, setStats] = useLocalStorage<any[] | undefined>('stats')
 
   const refetchTeam = useCallback(async () => {
     try {
@@ -255,26 +256,26 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [stats, refetchStat])
 
   // NOTE: special case
-  useEffect(() => {
-    const handleRefetchMatch = async () => {
-      await refetchMatch()
-    }
-    handleRefetchMatch()
-  }, [refetchMatch])
+  // useEffect(() => {
+  //   const handleRefetchMatch = async () => {
+  //     await refetchMatch()
+  //   }
+  //   handleRefetchMatch()
+  // }, [refetchMatch])
 
-  useEffect(() => {
-    const handleRefetchTeam = async () => {
-      await refetchTeam()
-    }
-    handleRefetchTeam()
-  }, [refetchTeam])
+  // useEffect(() => {
+  //   const handleRefetchTeam = async () => {
+  //     await refetchTeam()
+  //   }
+  //   handleRefetchTeam()
+  // }, [refetchTeam])
 
-  useEffect(() => {
-    const handleRefetchPlayer = async () => {
-      await refetchPlayer()
-    }
-    handleRefetchPlayer()
-  }, [refetchPlayer])
+  // useEffect(() => {
+  //   const handleRefetchPlayer = async () => {
+  //     await refetchPlayer()
+  //   }
+  //   handleRefetchPlayer()
+  // }, [refetchPlayer])
 
   const value = useMemo(
     () => ({

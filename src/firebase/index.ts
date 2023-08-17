@@ -49,7 +49,7 @@ if (IS_DEVELOP) {
 
   remoteConfig.settings.minimumFetchIntervalMillis = 0
   remoteConfig.defaultConfig = {
-    VITE_title: 'Vite firebase chat app from default',
+    VITE_title: 'groove league 2023',
     // dark_mode: false,
     timeout: 2000,
   }
