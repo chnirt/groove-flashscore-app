@@ -217,11 +217,7 @@ const NewTeam = () => {
             </Radio.Group>
           </Form.Item>
           {uploadMethod === 'file' && (
-            <Form.Item
-              name="teamLogo"
-              label="Team Logo"
-              rules={[{ required: true, message: 'Team Logo is required' }]}
-            >
+            <Form.Item name="teamLogo" label="Team Logo">
               <ImageUploader
                 upload={function (file: File): Promise<ImageUploadItem> {
                   const isJpgOrPng =
@@ -265,17 +261,7 @@ const NewTeam = () => {
           )}
           {uploadMethod === 'link' ? (
             maxCount === 1 ? (
-              <Form.Item
-                name="teamLogo"
-                label="Team Logo"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Team Logo is required',
-                  },
-                ]}
-                shouldUpdate
-              >
+              <Form.Item name="teamLogo" label="Team Logo" shouldUpdate>
                 <Input autoComplete="none" placeholder="https://example.com" />
               </Form.Item>
             ) : (
