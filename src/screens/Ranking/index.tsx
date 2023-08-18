@@ -1,20 +1,15 @@
 import { NavBar, PullToRefresh, Skeleton } from 'antd-mobile'
 import TeamsRanking from './components/TeamsRanking'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { routes } from '../../routes'
+import { useCallback, useMemo, useState } from 'react'
 import MatchButton from '../Match/components/MatchButton'
 import PlayersRanking from './components/PlayersRanking'
 
 const Ranking = () => {
-  const navigate = useNavigate()
   const {
     teams,
-    fetchTeam,
     refetchTeam,
     players,
-    fetchPlayer,
     refetchPlayer,
     refetchMatch,
     refetchStat,
@@ -42,20 +37,20 @@ const Ranking = () => {
     ])
   }, [refetchTeam, refetchMatch, refetchPlayer, refetchStat])
 
-  useEffect(() => {
-    const handleFetchTeam = async () => {
-      try {
-        if (typeof fetchTeam !== 'function') return
-        if (typeof fetchPlayer !== 'function') return
-        await Promise.all([fetchTeam(), fetchPlayer()])
-        // do something
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
+  // useEffect(() => {
+  //   const handleFetchTeam = async () => {
+  //     try {
+  //       if (typeof fetchTeam !== 'function') return
+  //       if (typeof fetchPlayer !== 'function') return
+  //       await Promise.all([fetchTeam(), fetchPlayer()])
+  //       // do something
+  //     } catch (e) {
+  //       navigate(routes.error)
+  //     }
+  //   }
 
-    handleFetchTeam()
-  }, [fetchTeam, fetchPlayer, navigate])
+  //   handleFetchTeam()
+  // }, [fetchTeam, fetchPlayer, navigate])
 
   const renderTabContent = useCallback(() => {
     switch (selectedIndex) {

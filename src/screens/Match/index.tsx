@@ -44,28 +44,28 @@ const Match = () => {
     })
   }, [matchId, navigate, refetchMatch])
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = useCallback((index: number = 0) => {
     const homeYellowCards =
       stats?.filter(
         (stat) =>
           stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.homeTeamId
-      ).length ?? 0
+      ).length ?? 0;
     const awayYellowCards =
       stats?.filter(
         (stat) =>
           stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.awayTeamId
-      ).length ?? 0
+      ).length ?? 0;
     const homeRedCards =
       stats?.filter(
         (stat) =>
           stat.statId === 'RED_CARD' && stat.teamId === myMatch.homeTeamId
-      ).length ?? 0
+      ).length ?? 0;
     const awayRedCards =
       stats?.filter(
         (stat) =>
           stat.statId === 'RED_CARD' && stat.teamId === myMatch.awayTeamId
-      ).length ?? 0
-    switch (selectedIndex) {
+      ).length ?? 0;
+    switch (index) {
       case 0:
         return [
           {
@@ -85,11 +85,11 @@ const Match = () => {
           },
         ].map((stat, si: number) => <Stat key={`stat-${si}`} stat={stat} />)
       case 1:
-        return <LineUp match={myMatch} />
+        return <LineUp matchData={myMatch} />
       default:
         return null
     }
-  }, [selectedIndex, myMatch, stats])
+  }, [myMatch, stats])
 
   useEffect(() => {
     if (matches?.length) {
@@ -149,23 +149,30 @@ const Match = () => {
           <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
         )}
 
-        <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
-          <div className="flex gap-4">
-            {['Stats', 'Line-up'].map((name: string, ti: number) => (
-              <MatchButton
-                key={`tab-${ti}`}
-                team={{
-                  name,
-                }}
-                selected={selectedIndex === ti}
-                onClick={() => {
-                  setSelectedIndex(ti);
-                }}
-              />
-            ))}
+        {myMatch ? (
+          <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
+            <div className="flex gap-4">
+              {['Stats', 'Line-up'].map((name: string, ti: number) => (
+                <MatchButton
+                  key={`tab-${ti}`}
+                  team={{
+                    name,
+                  }}
+                  selected={selectedIndex === ti}
+                  onClick={() => {
+                    setSelectedIndex(ti);
+                  }}
+                />
+              ))}
+            </div>
+            <div className="w-full">
+              <div className={`flex flex-col gap-3 ${selectedIndex !== 0 ? 'hidden' : ''}`}>{renderTabContent(0)}</div>
+              <div className={`flex flex-col gap-3 ${selectedIndex !== 1 ? 'hidden' : ''}`}>{renderTabContent(1)}</div>
+            </div>
           </div>
-          <div className="flex flex-col gap-3">{renderTabContent()}</div>
-        </div>
+        ) : (
+          <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
+        )}
       </div>
 
       {user ? (

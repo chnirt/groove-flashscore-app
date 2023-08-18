@@ -26,17 +26,16 @@ const initialValues = MASTER_MOCK_DATA.NEW_LINEUP
 
 const maxCount = 1
 
-const LineUp = ({ match }: { match: any }) => {
+const LineUp = ({ matchData }: { matchData?: any }) => {
   const [form] = Form.useForm()
   const uploadMethod = Form.useWatch('uploadMethod', form)
   const navigate = useNavigate()
   const { user } = useAuth()
-  const matchDocRef = getDocRef('matches', match.id)
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
-      if (user === null) return
-      if (match === null) return
+      if (!user) return
+      if (!matchData) return
       try {
         Loading.get.show()
         const { lineUpFile } = values
@@ -47,6 +46,7 @@ const LineUp = ({ match }: { match: any }) => {
           file,
         }
 
+        const matchDocRef = getDocRef('matches', matchData.id)
         await updateDocument(matchDocRef, lineUpData)
 
         Toast.show({
@@ -64,33 +64,19 @@ const LineUp = ({ match }: { match: any }) => {
         Loading.get.hide()
       }
     },
-    [user, match, matchDocRef]
-  )
-
-  const fetchLineUpById = useCallback(
-    async (matchDocRef: any) => {
-      const lineUpDocData: any = await getDocument(matchDocRef)
-      form.setFieldsValue({
-        ...lineUpDocData,
-        lineUpFile: lineUpDocData.file,
-      })
-    },
-    [form]
+    [user, matchData]
   )
 
   useEffect(() => {
-    if (typeof fetchLineUpById !== 'function') return
-    const handleFetchTeam = async () => {
-      try {
-        await fetchLineUpById(matchDocRef)
-        // do something
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
+    if (!user) return
+    if (!matchData) return
 
-    handleFetchTeam()
-  }, [fetchLineUpById, navigate, matchDocRef])
+    const { id, ...lineUpDocData } = matchData;
+    form.setFieldsValue({
+      ...lineUpDocData,
+      lineUpFile: lineUpDocData.file,
+    })
+  }, [matchData, form, navigate, user])
 
   if (user)
     return (
@@ -250,7 +236,7 @@ const LineUp = ({ match }: { match: any }) => {
     )
 
   return (
-    <img className="rounded-2xl object-contain" src={match?.file?.[0]?.url} />
+    <img className="rounded-2xl object-contain" src={matchData?.file?.[0]?.url || ""} />
   )
 }
 

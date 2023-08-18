@@ -34,12 +34,14 @@ const Stats = ({ header, matchId }: { header?: string; matchId?: string }) => {
 
   return (
     <Fragment>
-      <SearchBar
-        className="sticky top-[45px] z-10 bg-bgPrimary"
-        placeholder="Search"
-        value={searchText}
-        onChange={setSearchText}
-      />
+      {filterStats && filterStats.length > 0 && (
+        <SearchBar
+          className="sticky top-[45px] z-10 bg-bgPrimary"
+          placeholder="Search"
+          value={searchText}
+          onChange={setSearchText}
+        />
+      )}
       {filterStats === undefined ? (
         <Skeleton animated className="h-screen w-full rounded-3xl" />
       ) : filterStats.length === 0 ? null : (
