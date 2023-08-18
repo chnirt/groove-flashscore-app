@@ -13,7 +13,7 @@ const Loading = () => {
       {/* <div className="flex justify-center items-center">
         <Image
           className="w-8 aspect-square"
-          src={`${ORIGIN}/favicon_package_v0.16/favicon.ico`}
+          src={`${ORIGIN}/images/favicon.ico`}
         />
         Flash Score App
       </div> */}
