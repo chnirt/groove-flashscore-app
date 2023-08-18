@@ -41,18 +41,18 @@ export const storage = getStorage()
 
 export const batch = writeBatch(db);
 
-// if (IS_DEVELOP) {
-//   const AUTH_PORT = 9099
-//   const FIRESTORE_PORT = 8080
-//   const STORAGE_PORT = 9199
-//   connectAuthEmulator(auth, `http://localhost:${AUTH_PORT}`)
-//   connectFirestoreEmulator(db, 'localhost', FIRESTORE_PORT)
-//   connectStorageEmulator(storage, 'localhost', STORAGE_PORT)
+if (IS_DEVELOP) {
+  const AUTH_PORT = 9099
+  const FIRESTORE_PORT = 8080
+  const STORAGE_PORT = 9199
+  connectAuthEmulator(auth, `http://localhost:${AUTH_PORT}`)
+  connectFirestoreEmulator(db, 'localhost', FIRESTORE_PORT)
+  connectStorageEmulator(storage, 'localhost', STORAGE_PORT)
 
-//   remoteConfig.settings.minimumFetchIntervalMillis = 0
-//   remoteConfig.defaultConfig = {
-//     VITE_title: 'groove league 2023',
-//     // dark_mode: false,
-//     timeout: 2000,
-//   }
-// }
+  remoteConfig.settings.minimumFetchIntervalMillis = 0
+  remoteConfig.defaultConfig = {
+    VITE_title: 'groove league 2023',
+    // dark_mode: false,
+    timeout: 2000,
+  }
+}
