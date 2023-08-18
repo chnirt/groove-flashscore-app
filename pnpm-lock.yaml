@@ -6,76 +6,76 @@ settings:
 
 dependencies:
   '@uidotdev/usehooks':
-    specifier: ^2.1.0
+    specifier: 2.1.0
     version: 2.1.0(react-dom@18.2.0)(react@18.2.0)
   antd:
-    specifier: ^5.8.3
+    specifier: 5.8.3
     version: 5.8.3(moment@2.29.4)(react-dom@18.2.0)(react@18.2.0)
   antd-mobile:
-    specifier: ^5.32.0
+    specifier: 5.32.0
     version: 5.32.0(react-dom@18.2.0)(react@18.2.0)
   antd-mobile-icons:
-    specifier: ^0.3.0
+    specifier: 0.3.0
     version: 0.3.0
   classnames:
-    specifier: ^2.3.2
+    specifier: 2.3.2
     version: 2.3.2
   dayjs:
-    specifier: ^1.11.9
+    specifier: 1.11.9
     version: 1.11.9
   easymde:
-    specifier: ^2.18.0
+    specifier: 2.18.0
     version: 2.18.0
   firebase:
-    specifier: ^10.1.0
+    specifier: 10.1.0
     version: 10.1.0(react-native@0.72.3)
   framer-motion:
-    specifier: ^10.15.1
+    specifier: 10.15.1
     version: 10.15.1(react-dom@18.2.0)(react@18.2.0)
   localforage:
-    specifier: ^1.10.0
+    specifier: 1.10.0
     version: 1.10.0
   lodash:
-    specifier: ^4.17.21
+    specifier: 4.17.21
     version: 4.17.21
   match-sorter:
-    specifier: ^6.3.1
+    specifier: 6.3.1
     version: 6.3.1
   moment:
-    specifier: ^2.29.4
+    specifier: 2.29.4
     version: 2.29.4
   nanoid:
-    specifier: ^4.0.2
+    specifier: 4.0.2
     version: 4.0.2
   react:
-    specifier: ^18.2.0
+    specifier: 18.2.0
     version: 18.2.0
   react-dom:
-    specifier: ^18.2.0
+    specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
   react-icons:
-    specifier: ^4.10.1
+    specifier: 4.10.1
     version: 4.10.1(react@18.2.0)
   react-markdown:
-    specifier: ^8.0.7
+    specifier: 8.0.7
     version: 8.0.7(@types/react@18.2.15)(react@18.2.0)
   react-router-dom:
-    specifier: ^6.15.0
+    specifier: 6.15.0
     version: 6.15.0(react-dom@18.2.0)(react@18.2.0)
   react-simplemde-editor:
-    specifier: ^5.2.0
+    specifier: 5.2.0
     version: 5.2.0(easymde@2.18.0)(react-dom@18.2.0)(react@18.2.0)
   react-use:
-    specifier: ^17.4.0
+    specifier: 17.4.0
     version: 17.4.0(react-dom@18.2.0)(react@18.2.0)
   sort-by:
-    specifier: ^1.2.0
+    specifier: 1.2.0
     version: 1.2.0
   tailwind-merge:
-    specifier: ^1.14.0
+    specifier: 1.14.0
     version: 1.14.0
   tailwind-scrollbar-hide:
-    specifier: ^1.1.7
+    specifier: 1.1.7
     version: 1.1.7
 
 devDependencies:
