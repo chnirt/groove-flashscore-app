@@ -47,7 +47,7 @@ const Players = ({ header, teamId }: { header?: string; teamId?: string }) => {
       ) : filterPlayers.length === 0 ? null : (
         <List header={header} mode="card">
           {filterPlayers.map((player, pi: number) => {
-            const avatar = player?.avatar?.[0]?.url ?? ''
+            const avatar = player?.avatar?.[0]?.url ?? 'fallback'
             const team = teams?.find((team) => team.id === player.teamId)
             const teamLogo = team?.logo?.[0]?.url
             return (

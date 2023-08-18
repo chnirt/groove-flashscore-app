@@ -10,7 +10,7 @@ import {
 import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
 import moment from 'moment'
-import { MATCH_TIMING } from '../../constants'
+import { IS_DEVELOP, MATCH_TIMING } from '../../constants'
 import { useLocalStorage } from 'react-use'
 
 type FlashScoreType = {
@@ -33,24 +33,18 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  console.log('flashScoreProvider')
   const [teams, setTeams, removeTeams] = useLocalStorage<any[] | undefined>(
     'teams'
   )
-  // const [matches, setMatches, removeMatches] = useLocalStorage<
-  //   any[] | undefined
-  // >('matches')
+
   const [matches, setMatches] = useState<any[] | undefined>()
   const [players, setPlayers, removePlayers] = useLocalStorage<
     any[] | undefined
   >('players')
-  // const [stats, setStats, removeStats] = useLocalStorage<any[] | undefined>(
-  //   'stats'
-  // )
+
   const [stats, setStats] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
-    console.log('refetchTeam')
     try {
       const teamColGroupRef = getColRef('teams')
       const q = query(teamColGroupRef)
@@ -111,17 +105,18 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       removeTeams()
       setTeams(teamDocs)
     } catch (error) {
-      console.error(error)
+      if (IS_DEVELOP) {
+        console.error(error);
+      }
     }
-  }, [matches])
+  }, [matches, removeTeams, setTeams])
 
   const fetchTeam = useCallback(async () => {
-    if (teams !== undefined) return
+    // if (teams !== undefined) return
     await refetchTeam()
-  }, [teams, refetchTeam])
+  }, [refetchTeam])
 
   const refetchMatch = useCallback(async () => {
-    console.log('refetchMatch')
     try {
       const matchColGroupRef = getColRef('matches')
       const q = query(matchColGroupRef, orderBy('playDate', 'asc'))
@@ -201,7 +196,9 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       })
       setMatches(matchDocs)
     } catch (error) {
-      console.error(error)
+      if (IS_DEVELOP) {
+        console.error(error)
+      }
     }
   }, [stats])
 
@@ -211,7 +208,6 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [matches, refetchMatch])
 
   const refetchPlayer = useCallback(async () => {
-    console.log('refetchPlayer')
     try {
       const playerColGroupRef = getColRef('players')
       const q = query(playerColGroupRef)
@@ -243,17 +239,18 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       removePlayers()
       setPlayers(playerDocs)
     } catch (error) {
-      console.error(error)
+      if (IS_DEVELOP) {
+        console.error(error)
+      }
     }
-  }, [matches, stats])
+  }, [matches, removePlayers, setPlayers, stats])
 
   const fetchPlayer = useCallback(async () => {
-    if (players !== undefined) return
+    // if (players !== undefined) return
     await refetchPlayer()
-  }, [players, refetchPlayer])
+  }, [refetchPlayer])
 
   const refetchStat = useCallback(async () => {
-    console.log('refetchStat')
     try {
       const statColGroupRef = getColRef('stats')
       const q = query(statColGroupRef)
@@ -267,10 +264,11 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const newStats = statDocs.filter(
         (statDoc: any) => matchIdList?.includes(statDoc?.matchId)
       )
-      console.log(newStats)
       setStats(newStats)
     } catch (error) {
-      console.error(error)
+      if (IS_DEVELOP) {
+        console.error(error)
+      }
     }
   }, [matches])
 

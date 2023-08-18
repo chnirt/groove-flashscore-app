@@ -10,8 +10,11 @@ const MatchCard = ({
   completed,
 }: LiveMatchCardProps) => {
   const { teams } = useFlashScore()
-  if (teams?.length === 0) return null
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
+
+  if (teams?.length === 0) return null
+  if (!homeTeam) return null
+
   const homeName = homeTeam.name
   const homeTeamLogo = homeTeam.logo[0]?.url
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
@@ -22,6 +25,7 @@ const MatchCard = ({
   )
   const time = moment(playDate).format('HH:mm')
   const date = moment(playDate).format('DD MMM').toUpperCase()
+
   return (
     <button
       className={twMerge(

@@ -1,15 +1,17 @@
 import { Button, ErrorBlock } from 'antd-mobile'
-import { Link } from 'react-router-dom'
+import { Link, useRouteError } from 'react-router-dom'
 import { routes } from '../../routes'
 
 const Error = () => {
+  const error = useRouteError()
+
   return (
     <div>
       <ErrorBlock
         className="flex flex-col items-center justify-center"
         fullPage
         title="Oops!"
-        description="Sorry, an unexpected error has occurred."
+        description={error as string || "Sorry, an unexpected error has occurred."}
       >
         <Link to={routes.app}>
           <Button color="primary" fill="none" shape="rounded">
