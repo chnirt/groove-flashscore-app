@@ -34,13 +34,14 @@ const LiveMatchCard = ({
   if (teams?.length === 0) return null
   const groupStage = match.groupStage
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
-  const homeName = homeTeam.name
-  const homeTeamLogo = homeTeam.logo[0]?.url
+  const homeName = homeTeam?.name
+  const homeTeamLogo = homeTeam?.logo?.[0]?.url
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
-  const awayTeamName = awayTeam.name
-  const awayTeamLogo = awayTeam.logo[0]?.url
+  const awayTeamName = awayTeam?.name
+  const awayTeamLogo = awayTeam?.logo?.[0]?.url
+  // const playDate = moment(match?.playDate.toDate())
   const playDate = new Date(
-    match.playDate.seconds * 1000 + match.playDate.nanoseconds / 1000000
+    match?.playDate?.seconds * 1000 + match?.playDate?.nanoseconds / 1000000
   )
   const week = `Week ${moment(playDate)?.week()}`
   const time = moment.duration(moment().diff(playDate)).asMinutes().valueOf()

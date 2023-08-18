@@ -17,10 +17,49 @@ const Match = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { matches, stats, refetchMatch } = useFlashScore()
-  const myMatch = useMemo(
-    () => matches?.find((match) => match.id === matchId),
-    [matches, matchId]
-  )
+  const myMatch = useMemo(() => {
+    const foundMatch = matches?.find((match) => match.id === matchId)
+    const foundStats = stats?.filter((stat) => stat.matchId === matchId)
+    const homeGoals =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'GOAL' && stat.teamId === foundMatch.homeTeamId
+      ).length ?? 0
+    const awayGoals =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'GOAL' && stat.teamId === foundMatch.awayTeamId
+      ).length ?? 0
+    const homeYellowCards =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'YELLOW_CARD' && stat.teamId === foundMatch.homeTeamId
+      ).length ?? 0
+    const awayYellowCards =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'YELLOW_CARD' && stat.teamId === foundMatch.awayTeamId
+      ).length ?? 0
+    const homeRedCards =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'RED_CARD' && stat.teamId === foundMatch.homeTeamId
+      ).length ?? 0
+    const awayRedCards =
+      foundStats?.filter(
+        (stat) =>
+          stat.statId === 'RED_CARD' && stat.teamId === foundMatch.awayTeamId
+      ).length ?? 0
+    return {
+      ...foundMatch,
+      homeGoals,
+      awayGoals,
+      homeYellowCards,
+      awayYellowCards,
+      homeRedCards,
+      awayRedCards,
+    }
+  }, [matchId, matches, stats])
   const [selectedIndex, setSelectedIndex] = useState<number>(-1)
 
   const removeMatch = useCallback(async () => {
@@ -44,28 +83,8 @@ const Match = () => {
     })
   }, [matchId, navigate, refetchMatch])
 
-  const renderTabContent = useCallback((index: number = 0) => {
-    const homeYellowCards =
-      stats?.filter(
-        (stat) =>
-          stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.homeTeamId
-      ).length ?? 0;
-    const awayYellowCards =
-      stats?.filter(
-        (stat) =>
-          stat.statId === 'YELLOW_CARD' && stat.teamId === myMatch.awayTeamId
-      ).length ?? 0;
-    const homeRedCards =
-      stats?.filter(
-        (stat) =>
-          stat.statId === 'RED_CARD' && stat.teamId === myMatch.homeTeamId
-      ).length ?? 0;
-    const awayRedCards =
-      stats?.filter(
-        (stat) =>
-          stat.statId === 'RED_CARD' && stat.teamId === myMatch.awayTeamId
-      ).length ?? 0;
-    switch (index) {
+  const renderTabContent = useCallback(() => {
+    switch (selectedIndex) {
       case 0:
         return [
           {
@@ -75,13 +94,13 @@ const Match = () => {
           },
           {
             title: 'Yellow cards',
-            home: homeYellowCards,
-            away: awayYellowCards,
+            home: myMatch.homeYellowCards,
+            away: myMatch.awayYellowCards,
           },
           {
             title: 'Red cards',
-            home: homeRedCards,
-            away: awayRedCards,
+            home: myMatch.homeRedCards,
+            away: myMatch.awayRedCards,
           },
         ].map((stat, si: number) => <Stat key={`stat-${si}`} stat={stat} />)
       case 1:
@@ -89,14 +108,14 @@ const Match = () => {
       default:
         return null
     }
-  }, [myMatch, stats])
+  }, [selectedIndex, myMatch])
 
   useEffect(() => {
     if (matches?.length) {
       if (myMatch) {
         setSelectedIndex(0)
       } else {
-        throw "This match was not existed";
+        throw 'This match was not existed'
       }
     }
   }, [matches, myMatch])
@@ -108,7 +127,7 @@ const Match = () => {
         back={
           <button
             className="h-10 w-10 rounded-2xl bg-white p-2"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(routes.dashboard)}
           >
             <GoArrowLeft className="h-6 w-6 text-black2" />
           </button>
@@ -149,30 +168,23 @@ const Match = () => {
           <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
         )}
 
-        {myMatch ? (
-          <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
-            <div className="flex gap-4">
-              {['Stats', 'Line-up'].map((name: string, ti: number) => (
-                <MatchButton
-                  key={`tab-${ti}`}
-                  team={{
-                    name,
-                  }}
-                  selected={selectedIndex === ti}
-                  onClick={() => {
-                    setSelectedIndex(ti);
-                  }}
-                />
-              ))}
-            </div>
-            <div className="w-full">
-              <div className={`flex flex-col gap-3 ${selectedIndex !== 0 ? 'hidden' : ''}`}>{renderTabContent(0)}</div>
-              <div className={`flex flex-col gap-3 ${selectedIndex !== 1 ? 'hidden' : ''}`}>{renderTabContent(1)}</div>
-            </div>
+        <div className="flex flex-col gap-5 rounded-3xl bg-white p-4">
+          <div className="flex gap-4">
+            {['Stats', 'Line-up'].map((name: string, ti: number) => (
+              <MatchButton
+                key={`tab-${ti}`}
+                team={{
+                  name,
+                }}
+                selected={selectedIndex === ti}
+                onClick={() => {
+                  setSelectedIndex(ti)
+                }}
+              />
+            ))}
           </div>
-        ) : (
-          <Skeleton animated className="h-[13rem] w-full rounded-3xl" />
-        )}
+          <div className="flex flex-col gap-3">{renderTabContent()}</div>
+        </div>
       </div>
 
       {user ? (

@@ -41,10 +41,15 @@ const Home = () => {
       return
     }
 
-    isFetched.current = true;
+    isFetched.current = true
 
     const handleFetchTeam = async () => {
       try {
+        // localStorage.removeItem('teams')
+        // localStorage.removeItem('matches')
+        // localStorage.removeItem('matchs')
+        // localStorage.removeItem('players')
+        // localStorage.removeItem('stats')
         await Promise.all([
           fetchTeam(),
           fetchMatch(),
@@ -56,8 +61,8 @@ const Home = () => {
         navigate(routes.error)
       }
     }
-    handleFetchTeam();
-  });
+    handleFetchTeam()
+  })
 
   return (
     <div className="min-h-screen bg-black1">

@@ -3,7 +3,6 @@ import {
   PropsWithChildren,
   createContext,
   useCallback,
-  // useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -11,7 +10,6 @@ import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
 import moment from 'moment'
 import { IS_DEVELOP, MATCH_TIMING } from '../../constants'
-import { useLocalStorage } from 'react-use'
 
 type FlashScoreType = {
   teams?: any[]
@@ -33,15 +31,10 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [teams, setTeams, removeTeams] = useLocalStorage<any[] | undefined>(
-    'teams'
-  )
-
+  // console.log('FlashScoreProvider---')
+  const [teams, setTeams] = useState<any[] | undefined>()
   const [matches, setMatches] = useState<any[] | undefined>()
-  const [players, setPlayers, removePlayers] = useLocalStorage<
-    any[] | undefined
-  >('players')
-
+  const [players, setPlayers] = useState<any[] | undefined>()
   const [stats, setStats] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
@@ -50,71 +43,25 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const q = query(teamColGroupRef)
       querySnapshot = await getDocs(q)
       const teamDocs = querySnapshot.docs.map((doc) => {
-        const matchResult = matches?.filter(
-          (match) =>
-            match.matchType === 'RESULT' &&
-            [match.homeTeamId, match.awayTeamId].includes(doc.id)
-        )
-
-        const win = matchResult
-          ?.map((match) =>
-            match.homeTeamId === doc.id
-              ? match?.homeRanking?.win
-              : match?.awayRanking?.win
-          )
-          .reduce((a, b) => a + b, 0)
-        const draw = matchResult
-          ?.map((match) =>
-            match.homeTeamId === doc.id
-              ? match?.homeRanking?.draw
-              : match?.awayRanking?.draw
-          )
-          .reduce((a, b) => a + b, 0)
-        const lose = matchResult
-          ?.map((match) =>
-            match.homeTeamId === doc.id
-              ? match?.homeRanking?.lose
-              : match?.awayRanking?.lose
-          )
-          .reduce((a, b) => a + b, 0)
-        const goalDifference = matchResult
-          ?.map((match) =>
-            match.homeTeamId === doc.id
-              ? match?.homeRanking?.goalDifference
-              : match?.awayRanking?.goalDifference
-          )
-          .reduce((a, b) => a + b, 0)
-        const points = matchResult
-          ?.map((match) =>
-            match.homeTeamId === doc.id
-              ? match?.homeRanking?.points
-              : match?.awayRanking?.points
-          )
-          .reduce((a, b) => a + b, 0)
+        const data = doc.data()
         return {
           id: doc.id,
-          ...doc.data(),
-          matches: matchResult?.length ?? 0,
-          win: win ?? 0,
-          draw: draw ?? 0,
-          lose: lose ?? 0,
-          goalDifference: goalDifference ?? 0,
-          points: points ?? 0,
+          ...data,
         }
       })
-      removeTeams()
+      // console.log('teamDocs---', teamDocs)
       setTeams(teamDocs)
     } catch (error) {
       if (IS_DEVELOP) {
-        console.error(error);
+        console.error(error)
       }
     }
-  }, [matches, removeTeams, setTeams])
+  }, [])
 
   const fetchTeam = useCallback(async () => {
-    // if (teams !== undefined) return
+    if (teams !== undefined) return
     await refetchTeam()
-  }, [refetchTeam])
+  }, [refetchTeam, teams])
 
   const refetchMatch = useCallback(async () => {
     try {
@@ -132,52 +79,6 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         const isResult =
           playDate.isSameOrBefore(moment()) &&
           moment().diff(playDate, 'minutes') > MATCH_TIMING
-        const homeTeamId = data?.homeTeamId
-        const awayTeamId = data?.awayTeamId
-        const homeGoals =
-          stats?.filter(
-            (stat) => stat.statId === 'GOAL' && stat.teamId === homeTeamId
-          ).length ?? 0
-        const awayGoals =
-          stats?.filter(
-            (stat) => stat.statId === 'GOAL' && stat.teamId === awayTeamId
-          ).length ?? 0
-        const goalDifference = homeGoals - awayGoals
-        const isWin = goalDifference > 0
-        const isDraw = goalDifference === 0
-        const isLose = goalDifference < 0
-        const homeRanking = stats
-          ? {
-              win: isWin ? 1 : 0,
-              draw: isDraw ? 1 : 0,
-              lose: isLose ? 1 : 0,
-              goalDifference,
-              points: isWin ? 3 : isDraw ? 1 : isLose ? 0 : 0,
-            }
-          : {
-              win: 0,
-              draw: 0,
-              lose: 0,
-              goalDifference: 0,
-              points: 0,
-            }
-
-        const awayRanking = stats
-          ? {
-              win: !isWin ? 1 : 0,
-              draw: isDraw ? 1 : 0,
-              lose: !isLose ? 1 : 0,
-              goalDifference: -goalDifference,
-              points: !isWin ? 3 : isDraw ? 1 : !isLose ? 0 : 0,
-            }
-          : {
-              win: 0,
-              draw: 0,
-              lose: 0,
-              goalDifference: 0,
-              points: 0,
-            }
-
         return {
           id: doc.id,
           ...data,
@@ -188,19 +89,16 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
             : isResult
             ? 'RESULT'
             : '',
-          homeGoals,
-          awayGoals,
-          homeRanking,
-          awayRanking,
         }
       })
+      // console.log('matchDocs---', matchDocs)
       setMatches(matchDocs)
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [stats])
+  }, [])
 
   const fetchMatch = useCallback(async () => {
     // if (matches !== undefined) return
@@ -214,41 +112,25 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       querySnapshot = await getDocs(q)
       const playerDocs = querySnapshot.docs.map((doc) => {
         const data = doc.data()
-        const isGoalKeeper = data.goalkeeper
-        const teamId = data.teamId
-        const matchResult = matches?.filter(
-          (match) =>
-            match.matchType === 'RESULT' &&
-            [match.homeTeamId, match.awayTeamId].includes(teamId)
-        )
-        const goalkeeperPoints = matchResult
-          ?.map((match) =>
-            match.homeTeamId === teamId ? -match?.awayGoals : -match?.homeGoals
-          )
-          .reduce((a, b) => a + b, 0)
-        const points = stats?.filter(
-          (stat) => stat.statId === 'GOAL' && stat.playerId === doc.id
-        ).length
         return {
           id: doc.id,
-          ...doc.data(),
-          matches: matchResult?.length ?? 0,
-          points: isGoalKeeper ? goalkeeperPoints : points ?? 0,
+          ref: doc.ref,
+          ...data,
         }
       })
-      removePlayers()
+      // console.log('playerDocs---', playerDocs)
       setPlayers(playerDocs)
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [matches, removePlayers, setPlayers, stats])
+  }, [])
 
   const fetchPlayer = useCallback(async () => {
-    // if (players !== undefined) return
+    if (players !== undefined) return
     await refetchPlayer()
-  }, [refetchPlayer])
+  }, [refetchPlayer, players])
 
   const refetchStat = useCallback(async () => {
     try {
@@ -260,44 +142,19 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         ref: doc.ref,
         ...doc.data(),
       }))
-      const matchIdList = matches?.map((match) => match.id)
-      const newStats = statDocs.filter(
-        (statDoc: any) => matchIdList?.includes(statDoc?.matchId)
-      )
-      setStats(newStats)
+      // console.log('statDocs---', statDocs)
+      setStats(statDocs)
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [matches])
+  }, [])
 
   const fetchStat = useCallback(async () => {
     // if (stats !== undefined) return
     await refetchStat()
   }, [refetchStat])
-
-  // NOTE: special case
-  // useEffect(() => {
-  //   const handleRefetchMatch = async () => {
-  //     await refetchMatch()
-  //   }
-  //   handleRefetchMatch()
-  // }, [refetchMatch])
-
-  // useEffect(() => {
-  //   const handleRefetchTeam = async () => {
-  //     await refetchTeam()
-  //   }
-  //   handleRefetchTeam()
-  // }, [refetchTeam])
-
-  // useEffect(() => {
-  //   const handleRefetchPlayer = async () => {
-  //     await refetchPlayer()
-  //   }
-  //   handleRefetchPlayer()
-  // }, [refetchPlayer])
 
   const value = useMemo(
     () => ({
