@@ -53,7 +53,6 @@ const Register = () => {
         email,
       })
     } catch (error: any) {
-      // console.log(error.message)
       Toast.show({
         icon: 'error',
         content: error.message,

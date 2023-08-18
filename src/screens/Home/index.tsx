@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { IS_DEVELOP, eventNames } from '../../constants'
@@ -11,6 +11,7 @@ const Home = () => {
   const location = useLocation()
   const auth = useAuth()
   const navigate = useNavigate()
+  const isFetched = useRef(false)
   const { fetchTeam, fetchMatch, fetchPlayer, fetchStat } = useFlashScore()
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
@@ -31,12 +32,19 @@ const Home = () => {
   }, [location, scrollToTop])
 
   useEffectOnce(() => {
+    if (typeof fetchTeam !== 'function') return
+    if (typeof fetchMatch !== 'function') return
+    if (typeof fetchPlayer !== 'function') return
+    if (typeof fetchStat !== 'function') return
+
+    if (isFetched.current) {
+      return
+    }
+
+    isFetched.current = true;
+
     const handleFetchTeam = async () => {
       try {
-        if (typeof fetchTeam !== 'function') return
-        if (typeof fetchMatch !== 'function') return
-        if (typeof fetchPlayer !== 'function') return
-        if (typeof fetchStat !== 'function') return
         await Promise.all([
           fetchTeam(),
           fetchMatch(),
@@ -48,9 +56,9 @@ const Home = () => {
         navigate(routes.error)
       }
     }
+    handleFetchTeam();
+  });
 
-    handleFetchTeam()
-  })
   return (
     <div className="min-h-screen bg-black1">
       <Outlet context={auth} />

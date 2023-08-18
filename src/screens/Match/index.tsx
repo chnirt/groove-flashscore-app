@@ -1,6 +1,6 @@
 import { Button, Dialog, NavBar, Skeleton, Toast } from 'antd-mobile'
 import { generatePath, useNavigate, useParams } from 'react-router-dom'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { GoArrowLeft, GoKebabHorizontal } from 'react-icons/go'
 import { routes } from '../../routes'
 import LiveMatchCard from '../Dashboard/components/LiveMatchCard'
@@ -21,7 +21,7 @@ const Match = () => {
     () => matches?.find((match) => match.id === matchId),
     [matches, matchId]
   )
-  const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1)
 
   const removeMatch = useCallback(async () => {
     await Dialog.confirm({
@@ -91,6 +91,16 @@ const Match = () => {
     }
   }, [selectedIndex, myMatch, stats])
 
+  useEffect(() => {
+    if (matches?.length) {
+      if (myMatch) {
+        setSelectedIndex(0)
+      } else {
+        throw "This match was not existed";
+      }
+    }
+  }, [matches, myMatch])
+
   return (
     <div className="flex flex-col">
       <NavBar
@@ -148,7 +158,9 @@ const Match = () => {
                   name,
                 }}
                 selected={selectedIndex === ti}
-                onClick={() => setSelectedIndex(ti)}
+                onClick={() => {
+                  setSelectedIndex(ti);
+                }}
               />
             ))}
           </div>
