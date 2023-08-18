@@ -9,9 +9,6 @@ import { FlashScoreProvider } from './context/FlashScore'
 import './index.css'
 import LoadingMask from './components/LoadingMask'
 import { Loading } from './global'
-import 'lazysizes';
-// import a plugin
-import 'lazysizes/plugins/parent-fit/ls.parent-fit';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
