@@ -14,7 +14,7 @@ import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import dayjs from 'dayjs'
 import { Select } from 'antd'
-import { RefObject, useCallback, useEffect, useState } from 'react'
+import { RefObject, useCallback, useEffect, useMemo, useState } from 'react'
 import { DocumentData, DocumentReference, Timestamp } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
@@ -39,46 +39,59 @@ const NewMatch = () => {
   const { matchId } = useParams()
   const isEditMode = matchId
   const { user } = useAuth()
-  const { teams, refetchMatch } = useFlashScore()
-  const [matchDocRefState, setMatchDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
-
-  const fetchMatchById = useCallback(
-    async (matchId: string) => {
-      if (matchId === undefined) return
-      const matchDocRef = getDocRef('matches', matchId)
-      setMatchDocRefState(matchDocRef)
-      const matchDocData: any = await getDocument(matchDocRef)
-      const hours = moment(matchDocData.playDate.toDate()).hours()
-      const minutes = moment(matchDocData.playDate.toDate()).minutes()
-      form.setFieldsValue({
-        ...matchDocData,
-        playDate: matchDocData.playDate.toDate(),
-        time: [hours, minutes],
-      })
-    },
-    [form]
+  const { matches, teams, refetchMatch } = useFlashScore()
+  const myMatch = useMemo(
+    () => matches?.find((match) => match.id === matchId),
+    [matches, matchId]
   )
 
-  useEffect(() => {
-    const handleFetchMatch = async () => {
-      try {
-        if (matchId === undefined) return
-        if (typeof fetchMatchById !== 'function') return
-        await Promise.all([fetchMatchById(matchId)])
-      } catch (e) {
-        navigate(routes.error)
-      }
-    }
+  // const fetchMatchById = useCallback(
+  //   async (matchId: string) => {
+  //     if (matchId === undefined) return
+  //     const matchDocRef = getDocRef('matches', matchId)
+  //     if (matchDocRef === null) return
 
-    handleFetchMatch()
-  }, [matchId, fetchMatchById, navigate])
+  //     const matchDocData: any = await getDocument(matchDocRef)
+  //     const hours = moment(matchDocData.playDate.toDate()).hours()
+  //     const minutes = moment(matchDocData.playDate.toDate()).minutes()
+  //     form.setFieldsValue({
+  //       ...matchDocData,
+  //       playDate: matchDocData.playDate.toDate(),
+  //       time: [hours, minutes],
+  //     })
+  //   },
+  //   [form]
+  // )
+
+  // useEffect(() => {
+  //   const handleFetchMatch = async () => {
+  //     try {
+  //       if (matchId === undefined) return
+  //       if (typeof fetchMatchById !== 'function') return
+  //       await Promise.all([fetchMatchById(matchId)])
+  //     } catch (e) {
+  //       navigate(routes.error)
+  //     }
+  //   }
+
+  //   handleFetchMatch()
+  // }, [matchId, fetchMatchById, navigate])
+
+  useEffect(() => {
+    if (!myMatch) return
+    const hours = moment(myMatch.playDate.toDate()).hours()
+    const minutes = moment(myMatch.playDate.toDate()).minutes()
+    form.setFieldsValue({
+      ...myMatch,
+      playDate: myMatch.playDate.toDate(),
+      time: [hours, minutes],
+    });
+  }, [myMatch, form]);
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
-      if (user === null) return
+      if (!user) return
+
       try {
         Loading.get.show()
         const {
@@ -105,8 +118,11 @@ const NewMatch = () => {
         }
 
         if (isEditMode) {
-          if (matchDocRefState === null) return
-          await updateDocument(matchDocRefState, matchData)
+          if (!matchId) return
+          const matchDocRef = getDocRef('matches', matchId);
+
+          if (matchDocRef === null) return
+          await updateDocument(matchDocRef, matchData)
         } else {
           const matchDocRef = getColRef('matches')
           await addDocument(matchDocRef, matchData)
@@ -132,7 +148,7 @@ const NewMatch = () => {
         Loading.get.hide()
       }
     },
-    [user, navigate, refetchMatch, isEditMode, matchDocRefState]
+    [user, navigate, refetchMatch, isEditMode, matchId]
   )
 
   return (

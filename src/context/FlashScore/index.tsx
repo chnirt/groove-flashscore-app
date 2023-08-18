@@ -203,9 +203,9 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [stats])
 
   const fetchMatch = useCallback(async () => {
-    if (matches !== undefined) return
+    // if (matches !== undefined) return
     await refetchMatch()
-  }, [matches, refetchMatch])
+  }, [refetchMatch])
 
   const refetchPlayer = useCallback(async () => {
     try {
@@ -273,9 +273,9 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [matches])
 
   const fetchStat = useCallback(async () => {
-    if (stats !== undefined) return
+    // if (stats !== undefined) return
     await refetchStat()
-  }, [stats, refetchStat])
+  }, [refetchStat])
 
   // NOTE: special case
   // useEffect(() => {
