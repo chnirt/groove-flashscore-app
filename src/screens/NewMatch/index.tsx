@@ -14,8 +14,8 @@ import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
 import dayjs from 'dayjs'
 import { Select } from 'antd'
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react'
-import { DocumentData, DocumentReference, Timestamp } from 'firebase/firestore'
+import { RefObject, useCallback, useEffect, useMemo } from 'react'
+import { Timestamp } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { MASTER_MOCK_DATA } from '../../mocks'
@@ -23,7 +23,6 @@ import {
   addDocument,
   getColRef,
   getDocRef,
-  getDocument,
   updateDocument,
 } from '../../firebase/service'
 import { Loading } from '../../global'
@@ -85,8 +84,8 @@ const NewMatch = () => {
       ...myMatch,
       playDate: myMatch.playDate.toDate(),
       time: [hours, minutes],
-    });
-  }, [myMatch, form]);
+    })
+  }, [myMatch, form])
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
@@ -119,7 +118,7 @@ const NewMatch = () => {
 
         if (isEditMode) {
           if (!matchId) return
-          const matchDocRef = getDocRef('matches', matchId);
+          const matchDocRef = getDocRef('matches', matchId)
 
           if (matchDocRef === null) return
           await updateDocument(matchDocRef, matchData)

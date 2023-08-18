@@ -17,10 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import { uploadStorageBytesResumable } from '../../../../firebase/storage'
 import {
   getDocRef,
-  getDocument,
   updateDocument,
 } from '../../../../firebase/service'
-import { routes } from '../../../../routes'
 
 const initialValues = MASTER_MOCK_DATA.NEW_LINEUP
 
