@@ -10,6 +10,7 @@ import {
   getColRef,
   getDocRef,
   getDocument,
+  setCache,
   updateDocument,
 } from '../../firebase/service'
 import { Loading } from '../../global'
@@ -30,9 +31,6 @@ const NewStat = () => {
   const {
     matches,
     players,
-    refetchTeam,
-    refetchMatch,
-    refetchPlayer,
     refetchStat,
   } = useFlashScore()
   const [statDocRefState, setStatDocRefState] = useState<DocumentReference<
@@ -84,18 +82,10 @@ const NewStat = () => {
           await addDocument(statsDocRef, statData)
         }
 
-        if (
-          typeof refetchTeam === 'function' &&
-          typeof refetchMatch === 'function' &&
-          typeof refetchPlayer === 'function' &&
-          typeof refetchStat === 'function'
-        ) {
-          await Promise.all([
-            refetchTeam(),
-            refetchMatch(),
-            refetchPlayer(),
-            refetchStat(),
-          ])
+        await setCache('stats')
+
+        if (typeof refetchStat === 'function') {
+          await refetchStat()
         }
 
         navigate(-2)
@@ -117,9 +107,6 @@ const NewStat = () => {
     [
       user,
       navigate,
-      refetchTeam,
-      refetchMatch,
-      refetchPlayer,
       refetchStat,
       filteredPlayers,
       matchId,
@@ -136,6 +123,7 @@ const NewStat = () => {
       onConfirm: async () => {
         if (statDocRefState === null) return
         await deleteDoc(statDocRefState)
+        await setCache('stats')
         if (typeof refetchStat === 'function') {
           await refetchStat()
         }

@@ -13,7 +13,7 @@ import {
   updatePassword,
   UserCredential,
   updateProfile,
-} from "firebase/auth";
+} from 'firebase/auth'
 import {
   doc,
   getDoc,
@@ -28,131 +28,137 @@ import {
   DocumentReference,
   DocumentData,
   CollectionReference,
-} from "firebase/firestore";
+} from 'firebase/firestore'
 
-import { auth, db } from ".";
+import { auth, db } from '.'
 
 export const addDocument = async (
   ref:
     | DocumentReference<unknown, DocumentData>
     | CollectionReference<unknown, DocumentData>,
-  data = {},
+  data = {}
 ) => {
   const formatData = {
     ...data,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  };
+  }
   switch (ref.type) {
-    case "document": {
-      const docRef = await setDoc(ref, formatData);
-      return docRef;
+    case 'document': {
+      const docRef = await setDoc(ref, formatData)
+      return docRef
     }
-    case "collection": {
-      const docRef = await addDoc(ref, formatData);
-      return docRef;
+    case 'collection': {
+      const docRef = await addDoc(ref, formatData)
+      return docRef
     }
     default: {
-      return;
+      return
     }
   }
-};
+}
 
 export const getDocument = async (
-  ref: DocumentReference<unknown, DocumentData>,
+  ref: DocumentReference<unknown, DocumentData>
 ) => {
-  const docSnap = await getDoc(ref);
+  const docSnap = await getDoc(ref)
 
   if (docSnap.exists()) {
     // console.log('Document data:', docSnap.data())
-    return docSnap.data();
+    return docSnap.data()
   } else {
     // doc.data() will be undefined in this case
     // console.log('No such document!')
-    throw Error("No such document!");
+    throw Error('No such document!')
   }
-};
+}
 
 export const updateDocument = async (
   ref: DocumentReference<unknown, DocumentData>,
-  data = {},
+  data = {}
 ) => {
   await updateDoc(ref, {
     ...data,
     updatedAt: serverTimestamp(),
-  });
-};
+  })
+}
 
 export const getDocRef = (
-  collectionName = "todos",
+  collectionName = 'todos',
   ...pathSegments: string[]
-) => doc(db, collectionName, ...pathSegments);
+) => doc(db, collectionName, ...pathSegments)
 
 export const getColRef = (
-  collectionName = "todos",
+  collectionName = 'todos',
   ...pathSegments: string[]
-) => collection(db, collectionName, ...pathSegments);
+) => collection(db, collectionName, ...pathSegments)
 
-export const getColGroupRef = (collectionName = "todos") =>
-  collectionGroup(db, collectionName);
+export const getColGroupRef = (collectionName = 'todos') =>
+  collectionGroup(db, collectionName)
 
 export const deleteDocument = async (
-  collectionName = "todos",
+  collectionName = 'todos',
   ...pathSegments: string[]
 ) => {
-  const docRef = getDocRef(collectionName, ...pathSegments);
-  await deleteDoc(docRef);
-};
+  const docRef = getDocRef(collectionName, ...pathSegments)
+  await deleteDoc(docRef)
+}
 
-export const getBatch = () => writeBatch(db);
+export const getBatch = () => writeBatch(db)
 
 export const signInWithEmailAndPasswordFirebase = async (
   email: string,
-  password: string,
+  password: string
 ): Promise<UserCredential> => {
-  return await signInWithEmailAndPassword(auth, email, password);
-};
+  return await signInWithEmailAndPassword(auth, email, password)
+}
 
 export const createUserWithEmailAndPasswordFirebase = async (
   email: string,
-  password: string,
+  password: string
 ) => {
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email,
-    password,
-  );
-  return userCredential;
-};
+    password
+  )
+  return userCredential
+}
 
 export const fetchSignInMethodsForEmailFirebase = async (email: string) => {
-  const providers = await fetchSignInMethodsForEmail(auth, email);
-  return providers;
-};
+  const providers = await fetchSignInMethodsForEmail(auth, email)
+  return providers
+}
 
-export const signOutFirebase = async () => await signOut(auth);
+export const signOutFirebase = async () => await signOut(auth)
 
 export const reauthenticateWithCredentialFirebase = async (
-  currentPassword: string,
+  currentPassword: string
 ) => {
   // TODO(you): prompt the user to re-provide their sign-in credentials
-  const user = auth.currentUser;
-  if (user === null || user.email === null) return;
-  const credential = EmailAuthProvider.credential(user.email, currentPassword);
-  return await reauthenticateWithCredential(user, credential);
-};
+  const user = auth.currentUser
+  if (user === null || user.email === null) return
+  const credential = EmailAuthProvider.credential(user.email, currentPassword)
+  return await reauthenticateWithCredential(user, credential)
+}
 
 export const updatePasswordFirebase = async (newPassword: string) => {
-  const user = auth.currentUser;
-  if (user === null) return;
-  return await updatePassword(user, newPassword);
-};
+  const user = auth.currentUser
+  if (user === null) return
+  return await updatePassword(user, newPassword)
+}
 
 export const updateProfileFirebase = async (profile: {
-  displayName?: string | null | undefined;
-  photoURL?: string | null | undefined;
+  displayName?: string | null | undefined
+  photoURL?: string | null | undefined
 }) => {
-  const user = auth.currentUser;
-  if (user === null) return;
-  return await updateProfile(user, profile);
-};
+  const user = auth.currentUser
+  if (user === null) return
+  return await updateProfile(user, profile)
+}
+
+export const setCache = async (...pathSegments: string[]) => {
+  await setDoc(getDocRef('caches', ...pathSegments), {
+    updatedAt: serverTimestamp(),
+  })
+}

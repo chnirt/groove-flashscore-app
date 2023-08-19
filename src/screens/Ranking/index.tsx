@@ -23,6 +23,7 @@ const Ranking = () => {
         ?.filter(
           (match) =>
             match.matchType === 'RESULT' &&
+            match.hidden === false &&
             [match.homeTeamId, match.awayTeamId].includes(team.id)
         )
         .map((match) => {
@@ -84,7 +85,7 @@ const Ranking = () => {
       }
     })
   }, [teams, matches, stats])
-  
+
   const goalscorers = useMemo(() => {
     return players
       ?.filter((player) => !player?.goalkeeper)
@@ -93,6 +94,7 @@ const Ranking = () => {
         const matchResult = matches?.filter(
           (match) =>
             match.matchType === 'RESULT' &&
+            match.hidden === false &&
             [match.homeTeamId, match.awayTeamId].includes(teamId)
         )
         const points = stats?.filter(
@@ -113,6 +115,7 @@ const Ranking = () => {
         const matchResult = matches?.filter(
           (match) =>
             match.matchType === 'RESULT' &&
+            match.hidden === false &&
             [match.homeTeamId, match.awayTeamId].includes(teamId)
         )
         const goalkeeperPoints = matchResult

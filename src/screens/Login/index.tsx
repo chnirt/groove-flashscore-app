@@ -1,5 +1,4 @@
 import { Form, Input, Button, Toast } from 'antd-mobile'
-import { Fragment } from 'react'
 import { signInWithEmailAndPasswordFirebase } from '../../firebase/service'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import { Loading } from '../../global'
@@ -30,7 +29,7 @@ const Login = () => {
   }
 
   return (
-    <Fragment>
+    <div className="m-auto flex min-h-screen max-w-md flex-col bg-bgPrimary">
       <Form
         initialValues={initialValues}
         layout="horizontal"
@@ -86,7 +85,7 @@ const Login = () => {
           REGISTER
         </Button>
       </Link>
-    </Fragment>
+    </div>
   )
 }
 

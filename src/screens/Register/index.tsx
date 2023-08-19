@@ -1,5 +1,4 @@
 import { Form, Input, Button, Toast } from 'antd-mobile'
-import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 // import useAuth from "../../hooks/useAuth";
 import { routes } from '../../routes'
@@ -70,7 +69,7 @@ const Register = () => {
     // }
   }
   return (
-    <Fragment>
+    <div className="m-auto flex min-h-screen max-w-md flex-col bg-bgPrimary">
       <Form
         initialValues={initialValues}
         layout="horizontal"
@@ -184,7 +183,7 @@ const Register = () => {
           LOGIN
         </Button>
       </Link>
-    </Fragment>
+    </div>
   )
 }
 

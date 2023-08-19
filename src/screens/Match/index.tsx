@@ -9,7 +9,7 @@ import useAuth from '../../hooks/useAuth'
 import Stat from './components/Stat'
 import LineUp from './components/LineUp'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
-import { getDocRef } from '../../firebase/service'
+import { getDocRef, setCache } from '../../firebase/service'
 import { deleteDoc } from 'firebase/firestore'
 
 const Match = () => {
@@ -71,6 +71,7 @@ const Match = () => {
         if (matchId === undefined) return
         const matchDocRef = getDocRef('matches', matchId)
         await deleteDoc(matchDocRef)
+        await setCache('matches')
         if (typeof refetchMatch === 'function') {
           await refetchMatch()
         }

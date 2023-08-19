@@ -20,12 +20,16 @@ import {
   getColRef,
   getDocRef,
   getDocument,
+  setCache,
   updateDocument,
 } from '../../firebase/service'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
 import { routes } from '../../routes'
-import { DocumentData, DocumentReference } from 'firebase/firestore'
+import {
+  DocumentData,
+  DocumentReference,
+} from 'firebase/firestore'
 import Players from './components/Players'
 
 const initialValues = MASTER_MOCK_DATA.NEW_TEAM
@@ -66,6 +70,8 @@ const NewTeam = () => {
           const teamDocRef = getColRef('teams')
           await addDocument(teamDocRef, teamData)
         }
+
+        await setCache('teams')
 
         if (typeof refetchTeam === 'function') {
           await refetchTeam()

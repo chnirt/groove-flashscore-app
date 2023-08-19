@@ -23,6 +23,7 @@ import {
   addDocument,
   getColRef,
   getDocRef,
+  setCache,
   updateDocument,
 } from '../../firebase/service'
 import { Loading } from '../../global'
@@ -43,38 +44,6 @@ const NewMatch = () => {
     () => matches?.find((match) => match.id === matchId),
     [matches, matchId]
   )
-
-  // const fetchMatchById = useCallback(
-  //   async (matchId: string) => {
-  //     if (matchId === undefined) return
-  //     const matchDocRef = getDocRef('matches', matchId)
-  //     if (matchDocRef === null) return
-
-  //     const matchDocData: any = await getDocument(matchDocRef)
-  //     const hours = moment(matchDocData.playDate.toDate()).hours()
-  //     const minutes = moment(matchDocData.playDate.toDate()).minutes()
-  //     form.setFieldsValue({
-  //       ...matchDocData,
-  //       playDate: matchDocData.playDate.toDate(),
-  //       time: [hours, minutes],
-  //     })
-  //   },
-  //   [form]
-  // )
-
-  // useEffect(() => {
-  //   const handleFetchMatch = async () => {
-  //     try {
-  //       if (matchId === undefined) return
-  //       if (typeof fetchMatchById !== 'function') return
-  //       await Promise.all([fetchMatchById(matchId)])
-  //     } catch (e) {
-  //       navigate(routes.error)
-  //     }
-  //   }
-
-  //   handleFetchMatch()
-  // }, [matchId, fetchMatchById, navigate])
 
   useEffect(() => {
     if (!myMatch) return
@@ -126,6 +95,8 @@ const NewMatch = () => {
           const matchDocRef = getColRef('matches')
           await addDocument(matchDocRef, matchData)
         }
+
+        await setCache('matches')
 
         if (typeof refetchMatch === 'function') {
           await refetchMatch()

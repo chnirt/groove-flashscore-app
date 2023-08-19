@@ -17,8 +17,10 @@ import { useNavigate } from 'react-router-dom'
 import { uploadStorageBytesResumable } from '../../../../firebase/storage'
 import {
   getDocRef,
+  setCache,
   updateDocument,
 } from '../../../../firebase/service'
+import useFlashScore from '../../../../context/FlashScore/useFlashScore'
 
 const initialValues = MASTER_MOCK_DATA.NEW_LINEUP
 
@@ -29,6 +31,7 @@ const LineUp = ({ matchData }: { matchData?: any }) => {
   const uploadMethod = Form.useWatch('uploadMethod', form)
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { refetchMatch } = useFlashScore()
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
@@ -47,6 +50,12 @@ const LineUp = ({ matchData }: { matchData?: any }) => {
         const matchDocRef = getDocRef('matches', matchData.id)
         await updateDocument(matchDocRef, lineUpData)
 
+        await setCache('matches')
+
+        if (typeof refetchMatch === 'function') {
+          await refetchMatch()
+        }
+
         Toast.show({
           icon: 'success',
           content: 'LineUp is edited',
@@ -62,14 +71,14 @@ const LineUp = ({ matchData }: { matchData?: any }) => {
         Loading.get.hide()
       }
     },
-    [user, matchData]
+    [user, matchData, refetchMatch]
   )
 
   useEffect(() => {
     if (!user) return
     if (!matchData) return
 
-    const { id, ...lineUpDocData } = matchData;
+    const { ...lineUpDocData } = matchData
     form.setFieldsValue({
       ...lineUpDocData,
       lineUpFile: lineUpDocData.file,
@@ -234,7 +243,10 @@ const LineUp = ({ matchData }: { matchData?: any }) => {
     )
 
   return (
-    <img className="rounded-2xl object-contain" src={matchData?.file?.[0]?.url || ""} />
+    <img
+      className="rounded-2xl object-contain"
+      src={matchData?.file?.[0]?.url || ''}
+    />
   )
 }
 

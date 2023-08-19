@@ -22,6 +22,7 @@ import {
   getColRef,
   getDocRef,
   getDocument,
+  setCache,
   updateDocument,
 } from '../../firebase/service'
 import { Loading } from '../../global'
@@ -74,6 +75,8 @@ const NewMatch = () => {
           await addDocument(playerDocRef, playerData)
         }
 
+        await setCache('players')
+
         if (typeof refetchPlayer === 'function') {
           await refetchPlayer()
         }
@@ -105,6 +108,10 @@ const NewMatch = () => {
       onConfirm: async () => {
         if (playerDocRefState === null) return
         await deleteDoc(playerDocRefState)
+        await setCache('players')
+        if (typeof refetchPlayer === 'function') {
+          await refetchPlayer()
+        }
         navigate(-1)
         Toast.show({
           icon: 'success',
@@ -112,7 +119,7 @@ const NewMatch = () => {
         })
       },
     })
-  }, [playerDocRefState, navigate])
+  }, [playerDocRefState, navigate, refetchPlayer])
 
   const fetchPlayerById = useCallback(
     async (playerId: string) => {
