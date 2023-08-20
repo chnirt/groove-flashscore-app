@@ -47,11 +47,16 @@ const NewMatch = () => {
 
   useEffect(() => {
     if (!myMatch) return
-    const hours = moment(myMatch.playDate.toDate()).hours()
-    const minutes = moment(myMatch.playDate.toDate()).minutes()
+    // const playDate = myMatch.playDate.toDate()
+    const playDate = new Date(
+      myMatch?.playDate?.seconds * 1000 +
+        myMatch?.playDate?.nanoseconds / 1000000
+    )
+    const hours = moment(playDate).hours()
+    const minutes = moment(playDate).minutes()
     form.setFieldsValue({
       ...myMatch,
-      playDate: myMatch.playDate.toDate(),
+      playDate,
       time: [hours, minutes],
     })
   }, [myMatch, form])

@@ -44,35 +44,37 @@ const Stats = ({ header, matchId }: { header?: string; matchId?: string }) => {
       )}
       {filterStats === undefined ? (
         <Skeleton animated className="h-screen w-full rounded-3xl" />
-      ) : filterStats.length === 0 ? null : (
+      ) : (
         <List header={header} mode="card">
-          {filterStats.map((stat, pi: number) => {
-            return (
-              <List.Item
-                key={`stat-${pi}`}
-                onClick={
-                  user
-                    ? () =>
-                        navigate(
-                          generatePath(routes.editStat, {
-                            matchId: stat.matchId,
-                            statId: stat.id,
-                          })
-                        )
-                    : undefined
-                }
-                arrow={
-                  <div className="flex items-center">
-                    {stat?.statId ? (
-                      <div className="mr-2">{stat.statId}</div>
-                    ) : null}
-                  </div>
-                }
-              >
-                {stat.playerName}
-              </List.Item>
-            )
-          })}
+          {filterStats.length === 0
+            ? null
+            : filterStats.map((stat, pi: number) => {
+                return (
+                  <List.Item
+                    key={`stat-${pi}`}
+                    onClick={
+                      user
+                        ? () =>
+                            navigate(
+                              generatePath(routes.editStat, {
+                                matchId: stat.matchId,
+                                statId: stat.id,
+                              })
+                            )
+                        : undefined
+                    }
+                    arrow={
+                      <div className="flex items-center">
+                        {stat?.statId ? (
+                          <div className="mr-2">{stat.statId}</div>
+                        ) : null}
+                      </div>
+                    }
+                  >
+                    {stat.playerName}
+                  </List.Item>
+                )
+              })}
         </List>
       )}
     </Fragment>

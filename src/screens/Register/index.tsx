@@ -20,6 +20,7 @@ const Register = () => {
   // const { login } = useAuth();
   const onFinish = async (values: typeof initialValues) => {
     try {
+      return
       Loading.get.show()
       const { fullName, email, username, password } = values
       const providers = await fetchSignInMethodsForEmailFirebase(email)

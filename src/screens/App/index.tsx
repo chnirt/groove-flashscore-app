@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { useEffectOnce } from 'react-use'
 import { routes } from '../../routes'
+import { Loading } from '../../global'
 
 const App = () => {
   const isFetched = useRef(false)
@@ -26,36 +27,33 @@ const App = () => {
 
     const handleFetchAll = async () => {
       try {
-        // const myCaches = await fetchCache()
-        // if (myCaches.length > 0) {
-        //   const fetchAllPromises = myCaches
-        //     .filter((myCache: any) => myCache.sync)
-        //     .map((myCache: any) => {
-        //       switch (myCache.id) {
-        //         case 'teams':
-        //           return fetchTeam()
-        //         case 'matches':
-        //           return fetchMatch()
-        //         case 'players':
-        //           return fetchPlayer()
-        //         case 'stats':
-        //           return fetchStat()
-        //         default:
-        //           return
-        //       }
-        //     })
-        //   await Promise.all(fetchAllPromises)
-        //   return
-        // }
-        await Promise.all([
-          fetchTeam(),
-          fetchMatch(),
-          fetchPlayer(),
-          fetchStat(),
-        ])
+        Loading.get.show()
+        const myCaches = await fetchCache()
+        const fetchAllPromises: any[] = []
+        myCaches.forEach((myCache: any) => {
+          switch (myCache.id) {
+            case 'teams':
+              fetchAllPromises.push(fetchTeam())
+              break
+            case 'matches':
+              fetchAllPromises.push(fetchMatch())
+              break
+            case 'players':
+              fetchAllPromises.push(fetchPlayer())
+              break
+            case 'stats':
+              fetchAllPromises.push(fetchStat())
+              break
+            default:
+              break
+          }
+        })
+        await Promise.all(fetchAllPromises)
         // do something
       } catch (e) {
         navigate(routes.error)
+      } finally {
+        Loading.get.hide()
       }
     }
     handleFetchAll()

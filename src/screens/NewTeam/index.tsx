@@ -18,18 +18,15 @@ import { uploadStorageBytesResumable } from '../../firebase/storage'
 import {
   addDocument,
   getColRef,
-  getDocRef,
-  getDocument,
+  // getDocRef,
+  // getDocument,
   setCache,
   updateDocument,
 } from '../../firebase/service'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
 import { routes } from '../../routes'
-import {
-  DocumentData,
-  DocumentReference,
-} from 'firebase/firestore'
+import { DocumentData, DocumentReference } from 'firebase/firestore'
 import Players from './components/Players'
 
 const initialValues = MASTER_MOCK_DATA.NEW_TEAM
@@ -42,7 +39,7 @@ const NewTeam = () => {
   const { teamId } = useParams()
   const isEditMode = teamId
   const { user } = useAuth()
-  const { refetchTeam } = useFlashScore()
+  const { teams, refetchTeam } = useFlashScore()
   const uploadMethod = Form.useWatch('uploadMethod', form)
   const [teamDocRefState, setTeamDocRefState] = useState<DocumentReference<
     DocumentData,
@@ -98,9 +95,12 @@ const NewTeam = () => {
 
   const fetchTeamById = useCallback(
     async (teamId: string) => {
-      const teamDocRef = getDocRef('teams', teamId)
-      setTeamDocRefState(teamDocRef)
-      const teamDocData: any = await getDocument(teamDocRef)
+      if (teams === undefined) return
+      // const teamDocRef = getDocRef('teams', teamId)
+      // setTeamDocRefState(teamDocRef)
+      // const teamDocData1: any = await getDocument(teamDocRef)
+      const teamDocData = await teams.find((team) => team.id === teamId)
+      setTeamDocRefState(teamDocData.ref)
       const uploadMethod = form.getFieldValue('uploadMethod')
       const isFile = uploadMethod === 'file'
       form.setFieldsValue({
@@ -109,7 +109,7 @@ const NewTeam = () => {
         teamLogo: isFile ? teamDocData.logo : teamDocData.logo[0].url,
       })
     },
-    [form]
+    [form, teams]
   )
 
   useEffect(() => {

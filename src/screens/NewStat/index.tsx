@@ -88,7 +88,7 @@ const NewStat = () => {
           await refetchStat()
         }
 
-        navigate(-2)
+        navigate(-1)
         Toast.show({
           icon: 'success',
           content: isEditMode ? 'Saved' : 'Added',
