@@ -7,21 +7,16 @@ import { routes } from '../../routes'
 
 const App = () => {
   const isFetched = useRef(false)
-  const {
-    fetchTeam,
-    fetchMatch,
-    fetchPlayer,
-    fetchStat,
-    // fetchCache
-  } = useFlashScore()
+  const { fetchTeam, fetchMatch, fetchPlayer, fetchStat, fetchCache } =
+    useFlashScore()
   const navigate = useNavigate()
 
   useEffectOnce(() => {
+    if (typeof fetchCache !== 'function') return
     if (typeof fetchTeam !== 'function') return
     if (typeof fetchMatch !== 'function') return
     if (typeof fetchPlayer !== 'function') return
     if (typeof fetchStat !== 'function') return
-    // if (typeof fetchCache !== 'function') return
 
     if (isFetched.current) {
       return
@@ -31,24 +26,33 @@ const App = () => {
 
     const handleFetchAll = async () => {
       try {
-        // localStorage.removeItem('teams')
-        // localStorage.removeItem('matches')
-        // localStorage.removeItem('matchs')
-        // localStorage.removeItem('players')
-        // localStorage.removeItem('stats')
-        // const result: any = await fetchCache()
+        // const myCaches = await fetchCache()
+        // if (myCaches.length > 0) {
+        //   const fetchAllPromises = myCaches
+        //     .filter((myCache: any) => myCache.sync)
+        //     .map((myCache: any) => {
+        //       switch (myCache.id) {
+        //         case 'teams':
+        //           return fetchTeam()
+        //         case 'matches':
+        //           return fetchMatch()
+        //         case 'players':
+        //           return fetchPlayer()
+        //         case 'stats':
+        //           return fetchStat()
+        //         default:
+        //           return
+        //       }
+        //     })
+        //   await Promise.all(fetchAllPromises)
+        //   return
+        // }
         await Promise.all([
           fetchTeam(),
           fetchMatch(),
           fetchPlayer(),
           fetchStat(),
         ])
-        // await Promise.all([
-        //   ...(result?.teams ? [fetchTeam()] : []),
-        //   ...(result?.matches ? [fetchMatch()] : []),
-        //   ...(result?.players ? [fetchPlayer()] : []),
-        //   ...(result?.stats ? [fetchStat()] : []),
-        // ])
         // do something
       } catch (e) {
         navigate(routes.error)

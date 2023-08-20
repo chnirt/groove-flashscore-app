@@ -44,10 +44,11 @@ const LiveMatchCard = ({
     match?.playDate?.seconds * 1000 + match?.playDate?.nanoseconds / 1000000
   )
   const week = `Week ${moment(playDate)?.week()}`
+  const score = [homeGoals, awayGoals].join(' : ')
   const time = moment.duration(moment().diff(playDate)).asMinutes().valueOf()
   const timeDisplay =
     time > MATCH_TIMING
-      ? 'Overtime'
+      ? 'Full Time'
       : time < 0
       ? 'Updating'
       : `${Math.round(time)}'`
@@ -98,7 +99,7 @@ const LiveMatchCard = ({
                 selected && 'text-white'
               )}
             >
-              {homeGoals} : {awayGoals}
+              {score}
             </p>
             <div
               className={twMerge(

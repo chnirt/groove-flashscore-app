@@ -6,9 +6,10 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { getColRef } from '../../firebase/service'
 import { getDocs, orderBy, query } from 'firebase/firestore'
 import moment from 'moment'
+import { useLocalStorage } from 'usehooks-ts'
+import { getColRef } from '../../firebase/service'
 import { IS_DEVELOP, MATCH_TIMING } from '../../constants'
 
 type FlashScoreType = {
@@ -24,6 +25,8 @@ type FlashScoreType = {
   stats?: any[]
   fetchStat?: () => Promise<void>
   refetchStat?: () => Promise<void>
+  fetchCache?: () => Promise<any>
+  localCaches?: any[]
 }
 
 export const FlashScoreContext = createContext<FlashScoreType>({})
@@ -31,13 +34,31 @@ export const FlashScoreContext = createContext<FlashScoreType>({})
 let querySnapshot
 
 export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
-  // console.log('FlashScoreProvider---')
-  const [teams, setTeams] = useState<any[] | undefined>()
-  const [matches, setMatches] = useState<any[] | undefined>()
-  const [players, setPlayers] = useState<any[] | undefined>()
-  const [stats, setStats] = useState<any[] | undefined>()
+  IS_DEVELOP && console.log('FlashScoreProvider---')
+  const [teams, setTeams] = useLocalStorage<any[] | undefined>(
+    'teams',
+    undefined
+  )
+  const [matches, setMatches] = useLocalStorage<any[] | undefined>(
+    'matches',
+    undefined
+  )
+  const [players, setPlayers] = useLocalStorage<any[] | undefined>(
+    'players',
+    undefined
+  )
+  const [stats, setStats] = useLocalStorage<any[] | undefined>(
+    'stats',
+    undefined
+  )
+  const [localCaches, setLocalCaches] = useLocalStorage<any | undefined>(
+    'localCaches',
+    {}
+  )
+  const [caches, setCaches] = useState<any[] | undefined>()
 
   const refetchTeam = useCallback(async () => {
+    IS_DEVELOP && console.log('refetchTeam---')
     try {
       const teamColGroupRef = getColRef('teams')
       const q = query(teamColGroupRef)
@@ -49,21 +70,22 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           ...data,
         }
       })
-      // console.log('teamDocs---', teamDocs)
+      IS_DEVELOP && console.log('teamDocs---', teamDocs)
       setTeams(teamDocs)
+      setLocalCaches((prevState: any) => ({ ...prevState, teams: moment() }))
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [])
+  }, [setTeams, setLocalCaches])
 
   const fetchTeam = useCallback(async () => {
-    if (teams !== undefined) return
     await refetchTeam()
-  }, [refetchTeam, teams])
+  }, [refetchTeam])
 
   const refetchMatch = useCallback(async () => {
+    IS_DEVELOP && console.log('refetchMatch---')
     try {
       const matchColGroupRef = getColRef('matches')
       const q = query(matchColGroupRef, orderBy('playDate', 'asc'))
@@ -91,21 +113,22 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
             : '',
         }
       })
-      // console.log('matchDocs---', matchDocs)
+      IS_DEVELOP && console.log('matchDocs---', matchDocs)
       setMatches(matchDocs)
+      setLocalCaches((prevState: any) => ({ ...prevState, matches: moment() }))
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [])
+  }, [setMatches, setLocalCaches])
 
   const fetchMatch = useCallback(async () => {
-    // if (matches !== undefined) return
     await refetchMatch()
   }, [refetchMatch])
 
   const refetchPlayer = useCallback(async () => {
+    IS_DEVELOP && console.log('refetchPlayer---')
     try {
       const playerColGroupRef = getColRef('players')
       const q = query(playerColGroupRef)
@@ -118,21 +141,22 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
           ...data,
         }
       })
-      // console.log('playerDocs---', playerDocs)
+      IS_DEVELOP && console.log('playerDocs---', playerDocs)
       setPlayers(playerDocs)
+      setLocalCaches((prevState: any) => ({ ...prevState, players: moment() }))
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [])
+  }, [setPlayers, setLocalCaches])
 
   const fetchPlayer = useCallback(async () => {
-    if (players !== undefined) return
     await refetchPlayer()
-  }, [refetchPlayer, players])
+  }, [refetchPlayer])
 
   const refetchStat = useCallback(async () => {
+    IS_DEVELOP && console.log('refetchStat---')
     try {
       const statColGroupRef = getColRef('stats')
       const q = query(statColGroupRef)
@@ -142,19 +166,53 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         ref: doc.ref,
         ...doc.data(),
       }))
-      // console.log('statDocs---', statDocs)
+      IS_DEVELOP && console.log('statDocs---', statDocs)
       setStats(statDocs)
+      setLocalCaches((prevState: any) => ({ ...prevState, stats: moment() }))
     } catch (error) {
       if (IS_DEVELOP) {
         console.error(error)
       }
     }
-  }, [])
+  }, [setStats, setLocalCaches])
 
   const fetchStat = useCallback(async () => {
-    // if (stats !== undefined) return
     await refetchStat()
   }, [refetchStat])
+
+  const refetchCache = useCallback(async () => {
+    IS_DEVELOP && console.log('refetchCache---')
+    try {
+      const cacheColGroupRef = getColRef('caches')
+      const q = query(cacheColGroupRef)
+      querySnapshot = await getDocs(q)
+      const cacheDocs = querySnapshot.docs.map((doc) => {
+        const id = doc.id
+        const data = doc.data()
+        const globalUpdatedAt = moment(data?.updatedAt.toDate())
+        const localUpdatedAt = moment(localCaches?.[id])
+        const localCached = localCaches?.[id] !== undefined
+        const synced = localUpdatedAt.isAfter(globalUpdatedAt)
+        return {
+          id,
+          ...data,
+          localCached,
+          synced,
+        }
+      })
+      setCaches(cacheDocs)
+      return cacheDocs
+    } catch (error) {
+      if (IS_DEVELOP) {
+        console.error(error)
+      }
+    }
+  }, [localCaches])
+
+  const fetchCache = useCallback(async () => {
+    if (caches !== undefined) return
+    return await refetchCache()
+  }, [refetchCache, caches])
 
   const value = useMemo(
     () => ({
@@ -170,6 +228,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       stats,
       fetchStat,
       refetchStat,
+      fetchCache,
     }),
     [
       teams,
@@ -184,6 +243,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       stats,
       fetchStat,
       refetchStat,
+      fetchCache,
     ]
   )
   return (

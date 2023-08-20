@@ -17,7 +17,7 @@ import Logo from '../../assets/logo.png'
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { teams, refetchTeam, matches, refetchMatch } = useFlashScore()
+  const { teams, refetchTeam, matches, refetchMatch, stats } = useFlashScore()
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
   const formattedTeams = useMemo(
     () => (teams ? [{ name: 'All' }, ...teams] : []),
@@ -214,14 +214,33 @@ const Dashboard = () => {
                 </h2>
               </div>
               <div className="flex flex-col gap-4 px-4">
-                {myMatchResult.map((match, mi: number) => (
-                  <MatchCard
-                    key={`match-${mi}`}
-                    match={match}
-                    onClick={() => navigateMatch(match)}
-                    completed
-                  />
-                ))}
+                {myMatchResult.map((match, mi: number) => {
+                  const foundStats = stats?.filter(
+                    (stat) => stat.matchId === match.id
+                  )
+                  const homeGoals =
+                    foundStats?.filter(
+                      (stat) =>
+                        stat.statId === 'GOAL' &&
+                        stat.teamId === match.homeTeamId
+                    ).length ?? 0
+                  const awayGoals =
+                    foundStats?.filter(
+                      (stat) =>
+                        stat.statId === 'GOAL' &&
+                        stat.teamId === match.awayTeamId
+                    ).length ?? 0
+                  return (
+                    <MatchCard
+                      key={`match-${mi}`}
+                      match={match}
+                      onClick={() => navigateMatch(match)}
+                      completed
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                    />
+                  )
+                })}
               </div>
             </div>
           )}

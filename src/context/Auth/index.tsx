@@ -13,7 +13,7 @@ import { DocumentData, DocumentReference } from 'firebase/firestore'
 import { Toast } from 'antd-mobile'
 import { AuthContextType, IUser } from './type'
 import { auth } from '../../firebase'
-import { getDocRef, getDocument } from '../../firebase/service'
+// import { getDocRef, getDocument } from '../../firebase/service'
 import { Loading } from '../../global'
 
 export enum AuthStatus {
@@ -46,13 +46,16 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const fetchUser = useCallback(
     async (fbUser: User) => {
       try {
-        const userDocRef = getDocRef('users', fbUser.uid)
-        const userDocData: any = await getDocument(userDocRef)
-        if (userDocReference === null) {
-          setUserDocReference(userDocRef)
-        }
+        // const userDocRef = getDocRef('users', fbUser.uid)
+        // const userDocData: any = await getDocument(userDocRef)
+        // if (userDocReference === null) {
+        //   setUserDocReference(userDocRef)
+        // }
         // console.log(userDocData)
-        setUser({ ...fbUser, ...userDocData })
+        setUser({
+          ...fbUser,
+          // ...userDocData
+        })
       } catch (error: any) {
         // console.log(error)
         Toast.show({
