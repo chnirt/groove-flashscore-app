@@ -41,7 +41,7 @@ export const storage = getStorage()
 
 export const batch = writeBatch(db);
 
-if (!IS_DEVELOP) {
+if (IS_DEVELOP) {
   const AUTH_PORT = 9099
   const FIRESTORE_PORT = 8080
   const STORAGE_PORT = 9199
