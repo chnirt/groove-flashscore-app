@@ -1,15 +1,14 @@
 import { Button, Dialog, Form, NavBar, Toast } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft } from 'react-icons/go'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DocumentData, DocumentReference, deleteDoc } from 'firebase/firestore'
+import { useCallback, useEffect, useMemo } from 'react'
+import { deleteDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import {
   addDocument,
   getColRef,
   getDocRef,
-  getDocument,
   setCache,
   updateDocument,
 } from '../../firebase/service'
@@ -28,15 +27,7 @@ const NewStat = () => {
   const { matchId, statId } = useParams()
   const isEditMode = statId
   const { user } = useAuth()
-  const {
-    matches,
-    players,
-    refetchStat,
-  } = useFlashScore()
-  const [statDocRefState, setStatDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
+  const { matches, players, refetchStat, stats } = useFlashScore()
   const filteredPlayers = useMemo(() => {
     if (matchId === undefined) return undefined
     const foundedMatch = matches?.find((match) => match.id === matchId)
@@ -57,7 +48,7 @@ const NewStat = () => {
       if (user === null) return
       try {
         Loading.get.show()
-        const { statId, playerId, goalKeeperId } = values
+        const { statId: statIdState, playerId, goalKeeperId } = values
         const foundPlayer = filteredPlayers?.find(
           (filteredPlayer) => filteredPlayer.id === playerId
         )
@@ -65,7 +56,7 @@ const NewStat = () => {
         const playerName = foundPlayer.name
         const uid = user.uid
         const statData = {
-          statId,
+          statId: statIdState,
           playerId,
           playerName,
           ...(goalKeeperId ? { goalKeeperId } : {}),
@@ -75,8 +66,10 @@ const NewStat = () => {
         }
 
         if (isEditMode) {
-          if (statDocRefState === null) return
-          await updateDocument(statDocRefState, statData)
+          if (statId === undefined) return
+          const statDocRef = getDocRef('stats', statId)
+          if (statDocRef === undefined) return
+          await updateDocument(statDocRef, statData)
         } else {
           const statsDocRef = getColRef('stats')
           await addDocument(statsDocRef, statData)
@@ -104,15 +97,7 @@ const NewStat = () => {
         Loading.get.hide()
       }
     },
-    [
-      user,
-      navigate,
-      refetchStat,
-      filteredPlayers,
-      matchId,
-      statDocRefState,
-      isEditMode,
-    ]
+    [user, navigate, refetchStat, filteredPlayers, matchId, isEditMode, statId]
   )
 
   const removePlayer = useCallback(async () => {
@@ -121,8 +106,10 @@ const NewStat = () => {
       cancelText: 'Cancel',
       confirmText: 'Delete',
       onConfirm: async () => {
-        if (statDocRefState === null) return
-        await deleteDoc(statDocRefState)
+        if (statId === undefined) return
+        const statDocRef = getDocRef('stats', statId)
+        if (statDocRef === undefined) return
+        await deleteDoc(statDocRef)
         await setCache('stats')
         if (typeof refetchStat === 'function') {
           await refetchStat()
@@ -134,18 +121,17 @@ const NewStat = () => {
         })
       },
     })
-  }, [statDocRefState, navigate, refetchStat])
+  }, [navigate, refetchStat, statId])
 
   const fetchStatById = useCallback(
     async (statId: string) => {
-      const statDocRef = getDocRef('stats', statId)
-      setStatDocRefState(statDocRef)
-      const statDocData: any = await getDocument(statDocRef)
+      if (stats === undefined) return
+      const statDocData = await stats.find((team) => team.id === statId)
       form.setFieldsValue({
         ...statDocData,
       })
     },
-    [form]
+    [form, stats]
   )
 
   useEffect(() => {

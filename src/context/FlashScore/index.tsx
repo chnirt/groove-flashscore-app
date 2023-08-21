@@ -184,8 +184,8 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       const cacheDocs = querySnapshot.docs.map((doc) => {
         const id = doc.id
         const data = doc.data()
-        const globalUpdatedAt = moment(data?.updatedAt.toDate())
-        const localUpdatedAtCache =
+        const serverUpdatedAt = moment(data?.updatedAt.toDate())
+        const clientUpdatedAtCache =
           id === 'teams'
             ? localStorage.getItem('teamsUpdatedAt')
             : id === 'matches'
@@ -195,17 +195,17 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
             : id === 'stats'
             ? localStorage.getItem('statsUpdatedAt')
             : null
-        const localUpdatedAt = moment(localUpdatedAtCache)
+        const clientUpdatedAt = moment(clientUpdatedAtCache)
         // IS_DEVELOP &&
         //   console.log(
         //     'compare---',
-        //     localUpdatedAt.toDate(),
-        //     globalUpdatedAt.toDate()
+        //     clientUpdatedAt.toDate(),
+        //     serverUpdatedAt.toDate()
         //   )
         const synced =
-          localUpdatedAtCache === null
+          clientUpdatedAtCache === null
             ? true
-            : localUpdatedAt.isBefore(globalUpdatedAt)
+            : clientUpdatedAt.isBefore(serverUpdatedAt)
         return {
           id,
           ...data,

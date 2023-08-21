@@ -49,6 +49,12 @@ const App = () => {
           }
         })
         await Promise.all(fetchAllPromises)
+        // await Promise.all([
+        //   fetchTeam(),
+        //   fetchMatch(),
+        //   fetchPlayer(),
+        //   fetchStat(),
+        // ])
         // do something
       } catch (e) {
         navigate(routes.error)

@@ -45,22 +45,6 @@ const NewMatch = () => {
     [matches, matchId]
   )
 
-  useEffect(() => {
-    if (!myMatch) return
-    // const playDate = myMatch.playDate.toDate()
-    const playDate = new Date(
-      myMatch?.playDate?.seconds * 1000 +
-        myMatch?.playDate?.nanoseconds / 1000000
-    )
-    const hours = moment(playDate).hours()
-    const minutes = moment(playDate).minutes()
-    form.setFieldsValue({
-      ...myMatch,
-      playDate,
-      time: [hours, minutes],
-    })
-  }, [myMatch, form])
-
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
       if (!user) return
@@ -91,14 +75,13 @@ const NewMatch = () => {
         }
 
         if (isEditMode) {
-          if (!matchId) return
+          if (matchId === undefined) return
           const matchDocRef = getDocRef('matches', matchId)
-
           if (matchDocRef === null) return
           await updateDocument(matchDocRef, matchData)
         } else {
-          const matchDocRef = getColRef('matches')
-          await addDocument(matchDocRef, matchData)
+          const matchColRef = getColRef('matches')
+          await addDocument(matchColRef, matchData)
         }
 
         await setCache('matches')
@@ -125,6 +108,22 @@ const NewMatch = () => {
     },
     [user, navigate, refetchMatch, isEditMode, matchId]
   )
+
+  useEffect(() => {
+    if (!myMatch) return
+    // const playDate = myMatch.playDate.toDate()
+    const playDate = new Date(
+      myMatch?.playDate?.seconds * 1000 +
+        myMatch?.playDate?.nanoseconds / 1000000
+    )
+    const hours = moment(playDate).hours()
+    const minutes = moment(playDate).minutes()
+    form.setFieldsValue({
+      ...myMatch,
+      playDate,
+      time: [hours, minutes],
+    })
+  }, [myMatch, form])
 
   return (
     <div>

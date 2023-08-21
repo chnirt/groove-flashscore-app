@@ -70,6 +70,7 @@ const Match = () => {
       onConfirm: async () => {
         if (matchId === undefined) return
         const matchDocRef = getDocRef('matches', matchId)
+        if (matchDocRef === undefined) return
         await deleteDoc(matchDocRef)
         await setCache('matches')
         if (typeof refetchMatch === 'function') {

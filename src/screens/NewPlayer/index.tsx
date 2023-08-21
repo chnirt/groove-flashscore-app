@@ -13,15 +13,14 @@ import {
 } from 'antd-mobile'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoArrowLeft, GoPlusCircle } from 'react-icons/go'
-import { useCallback, useEffect, useState } from 'react'
-import { DocumentData, DocumentReference, deleteDoc } from 'firebase/firestore'
+import { useCallback, useEffect } from 'react'
+import { deleteDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { MASTER_MOCK_DATA } from '../../mocks'
 import {
   addDocument,
   getColRef,
   getDocRef,
-  getDocument,
   setCache,
   updateDocument,
 } from '../../firebase/service'
@@ -41,11 +40,7 @@ const NewMatch = () => {
   const { teamId, playerId } = useParams()
   const isEditMode = playerId
   const { user } = useAuth()
-  const { refetchPlayer } = useFlashScore()
-  const [playerDocRefState, setPlayerDocRefState] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null)
+  const { refetchPlayer, players } = useFlashScore()
 
   const onFinish = useCallback(
     async (values: typeof initialValues) => {
@@ -68,8 +63,10 @@ const NewMatch = () => {
         }
 
         if (isEditMode) {
-          if (playerDocRefState === null) return
-          await updateDocument(playerDocRefState, playerData)
+          if (playerId === undefined) return
+          const playerDocRef = getDocRef('players', playerId)
+          if (playerDocRef === null) return
+          await updateDocument(playerDocRef, playerData)
         } else {
           const playerDocRef = getColRef('players')
           await addDocument(playerDocRef, playerData)
@@ -97,7 +94,7 @@ const NewMatch = () => {
         Loading.get.hide()
       }
     },
-    [user, teamId, navigate, isEditMode, playerDocRefState, refetchPlayer]
+    [user, teamId, navigate, isEditMode, refetchPlayer, playerId]
   )
 
   const removePlayer = useCallback(async () => {
@@ -106,8 +103,10 @@ const NewMatch = () => {
       cancelText: 'Cancel',
       confirmText: 'Delete',
       onConfirm: async () => {
-        if (playerDocRefState === null) return
-        await deleteDoc(playerDocRefState)
+        if (playerId === undefined) return
+        const playerDocRef = getDocRef('players', playerId)
+        if (playerDocRef === null) return
+        await deleteDoc(playerDocRef)
         await setCache('players')
         if (typeof refetchPlayer === 'function') {
           await refetchPlayer()
@@ -119,20 +118,21 @@ const NewMatch = () => {
         })
       },
     })
-  }, [playerDocRefState, navigate, refetchPlayer])
+  }, [navigate, refetchPlayer, playerId])
 
   const fetchPlayerById = useCallback(
     async (playerId: string) => {
-      const playerDocRef = getDocRef('players', playerId)
-      setPlayerDocRefState(playerDocRef)
-      const playerDocData: any = await getDocument(playerDocRef)
+      if (players === undefined) return
+      const playerDocData = await players.find(
+        (players) => players.id === playerId
+      )
       form.setFieldsValue({
         ...playerDocData,
         playerName: playerDocData.name,
         playerAvatar: playerDocData.avatar,
       })
     },
-    [form]
+    [form, players]
   )
 
   useEffect(() => {
