@@ -209,8 +209,12 @@ const NewMatch = () => {
               message: 'Jersey Number must be number',
             },
             {
-              len: 2,
-              message: 'Jersey Number should be at least 4 characters',
+              min: 2,
+              message: 'Jersey Number should be at least 2 characters',
+            },
+            {
+              max: 3,
+              message: 'Jersey Number must have at 3 characters',
             },
           ]}
           shouldUpdate
