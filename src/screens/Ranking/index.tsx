@@ -4,6 +4,7 @@ import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { useCallback, useMemo, useState } from 'react'
 import MatchButton from '../Match/components/MatchButton'
 import PlayersRanking from './components/PlayersRanking'
+import { IS_MOCK } from '../../constants'
 
 const Ranking = () => {
   const {
@@ -76,6 +77,11 @@ const Ranking = () => {
       const points = pointsTotal ?? 0
       return {
         ...team,
+        ...(IS_MOCK
+          ? {
+              name: 'Name Team',
+            }
+          : {}),
         matches: matchResult?.length ?? 0,
         win: win ?? 0,
         draw: draw ?? 0,
@@ -102,6 +108,11 @@ const Ranking = () => {
         ).length
         return {
           ...player,
+          ...(IS_MOCK
+            ? {
+                name: 'Name Player',
+              }
+            : {}),
           matches: matchResult?.length ?? 0,
           points: points ?? 0,
         }
@@ -138,6 +149,11 @@ const Ranking = () => {
           .reduce((a, b) => a + b, 0)
         return {
           ...player,
+          ...(IS_MOCK
+            ? {
+                name: 'Name Player',
+              }
+            : {}),
           matches: matchResult?.length ?? 0,
           points: goalkeeperPoints ?? 0,
         }

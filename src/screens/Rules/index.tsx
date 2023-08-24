@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import SimpleMDE from 'react-simplemde-editor'
 import { Button, NavBar, Skeleton, Toast } from 'antd-mobile'
+import { faker } from '@faker-js/faker'
 import 'easymde/dist/easymde.min.css'
 import useAuth from '../../hooks/useAuth'
 import { Loading } from '../../global'
@@ -12,6 +13,7 @@ import {
 } from '../../firebase/service'
 // import { routes } from '../../routes'
 import { useNavigate } from 'react-router-dom'
+import { IS_MOCK } from '../../constants'
 
 const markdown = `
 ## 1.	Đối tượng tham gia:
@@ -118,7 +120,7 @@ const Rules = () => {
   const fetchRules = useCallback(async () => {
     // const userDocRef = getDocRef('users', uid)
     // const userDocData: any = await getDocument(userDocRef)
-    setValue(markdown)
+    setValue(IS_MOCK ? faker.lorem.sentences() : markdown)
   }, [])
 
   useEffect(() => {

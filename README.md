@@ -1,3 +1,6 @@
+## Demo
+<img src="src/assets/demo.gif" alt="mobile">
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

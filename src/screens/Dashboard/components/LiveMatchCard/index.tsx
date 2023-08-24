@@ -2,7 +2,7 @@ import { twMerge } from 'tailwind-merge'
 import moment from 'moment'
 import { Timestamp } from 'firebase/firestore'
 import useFlashScore from '../../../../context/FlashScore/useFlashScore'
-import { MATCH_TIMING } from '../../../../constants'
+import { IS_MOCK, MATCH_TIMING } from '../../../../constants'
 
 export type MatchType = {
   id: string
@@ -34,11 +34,15 @@ const LiveMatchCard = ({
   if (teams?.length === 0) return null
   const groupStage = match.groupStage
   const homeTeam = teams?.find((team) => team.id === match.homeTeamId)
-  const homeName = homeTeam?.name
-  const homeTeamLogo = homeTeam?.logo?.[0]?.url
+  const homeName = IS_MOCK ? 'Home Team' : homeTeam?.name
+  const homeTeamLogo = IS_MOCK
+    ? 'https://images.vexels.com/media/users/3/132208/isolated/preview/b6c63f2ec9d7dc0b53c71d47dc800561-soccer-logo.png'
+    : homeTeam?.logo?.[0]?.url
   const awayTeam = teams?.find((team) => team.id === match.awayTeamId)
-  const awayTeamName = awayTeam?.name
-  const awayTeamLogo = awayTeam?.logo?.[0]?.url
+  const awayTeamName = IS_MOCK ? 'Away Team' : awayTeam?.name
+  const awayTeamLogo = IS_MOCK
+    ? 'https://images.vexels.com/media/users/3/132208/isolated/preview/b6c63f2ec9d7dc0b53c71d47dc800561-soccer-logo.png'
+    : awayTeam?.logo?.[0]?.url
   // const playDate = moment(match?.playDate.toDate())
   const playDate = new Date(
     match?.playDate?.seconds * 1000 + match?.playDate?.nanoseconds / 1000000
