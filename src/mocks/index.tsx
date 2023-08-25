@@ -48,6 +48,7 @@ export const MASTER_MOCK_DATA = {
     playDate: IS_DEVELOP ? new Date() : null,
     time: [],
     hidden: false,
+    uncount: false,
   },
   NEW_PLAYER: {
     playerName: IS_DEVELOP ? 'Chnirt' : '',

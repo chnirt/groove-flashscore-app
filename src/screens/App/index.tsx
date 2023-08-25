@@ -28,33 +28,33 @@ const App = () => {
     const handleFetchAll = async () => {
       try {
         Loading.get.show()
-        const myCaches = await fetchCache()
-        const fetchAllPromises: any[] = []
-        myCaches.forEach((myCache: any) => {
-          switch (myCache.id) {
-            case 'teams':
-              fetchAllPromises.push(fetchTeam())
-              break
-            case 'matches':
-              fetchAllPromises.push(fetchMatch())
-              break
-            case 'players':
-              fetchAllPromises.push(fetchPlayer())
-              break
-            case 'stats':
-              fetchAllPromises.push(fetchStat())
-              break
-            default:
-              break
-          }
-        })
-        await Promise.all(fetchAllPromises)
-        // await Promise.all([
-        //   fetchTeam(),
-        //   fetchMatch(),
-        //   fetchPlayer(),
-        //   fetchStat(),
-        // ])
+        // const myCaches = await fetchCache()
+        // const fetchAllPromises: any[] = []
+        // myCaches.forEach((myCache: any) => {
+        //   switch (myCache.id) {
+        //     case 'teams':
+        //       fetchAllPromises.push(fetchTeam())
+        //       break
+        //     case 'matches':
+        //       fetchAllPromises.push(fetchMatch())
+        //       break
+        //     case 'players':
+        //       fetchAllPromises.push(fetchPlayer())
+        //       break
+        //     case 'stats':
+        //       fetchAllPromises.push(fetchStat())
+        //       break
+        //     default:
+        //       break
+        //   }
+        // })
+        // await Promise.all(fetchAllPromises)
+        await Promise.all([
+          fetchTeam(),
+          fetchMatch(),
+          fetchPlayer(),
+          fetchStat(),
+        ])
         // do something
       } catch (e) {
         navigate(routes.error)

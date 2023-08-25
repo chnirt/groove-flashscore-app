@@ -58,6 +58,7 @@ const NewMatch = () => {
           playDate,
           time,
           hidden,
+          uncount,
         }: any = values
         if (playDate === null) return
         if (time.length > 0) {
@@ -71,6 +72,7 @@ const NewMatch = () => {
           awayTeamId,
           playDate: Timestamp.fromDate(playDate),
           hidden,
+          uncount,
           uid,
         }
 
@@ -307,6 +309,15 @@ const NewMatch = () => {
         <Form.Item
           name="hidden"
           label="Hidden"
+          childElementPosition="right"
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+
+        <Form.Item
+          name="uncount"
+          label="Uncount"
           childElementPosition="right"
           valuePropName="checked"
         >

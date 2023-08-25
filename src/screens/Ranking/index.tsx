@@ -25,6 +25,7 @@ const Ranking = () => {
           (match) =>
             match.matchType === 'RESULT' &&
             match.hidden === false &&
+            !match.uncount &&
             [match.homeTeamId, match.awayTeamId].includes(team.id)
         )
         .map((match) => {
@@ -93,30 +94,28 @@ const Ranking = () => {
   }, [teams, matches, stats])
 
   const goalscorers = useMemo(() => {
-    return players
-      ?.filter((player) => !player?.goalkeeper)
-      ?.map((player) => {
-        const teamId = player.teamId
-        const matchResult = matches?.filter(
-          (match) =>
-            match.matchType === 'RESULT' &&
-            match.hidden === false &&
-            [match.homeTeamId, match.awayTeamId].includes(teamId)
-        )
-        const points = stats?.filter(
-          (stat) => stat.statId === 'GOAL' && stat.playerId === player.id
-        ).length
-        return {
-          ...player,
-          ...(IS_MOCK
-            ? {
-                name: 'Name Player',
-              }
-            : {}),
-          matches: matchResult?.length ?? 0,
-          points: points ?? 0,
-        }
-      })
+    return players?.map((player) => {
+      const teamId = player.teamId
+      const matchResult = matches?.filter(
+        (match) =>
+          match.matchType === 'RESULT' &&
+          match.hidden === false &&
+          [match.homeTeamId, match.awayTeamId].includes(teamId)
+      )
+      const points = stats?.filter(
+        (stat) => stat.statId === 'GOAL' && stat.playerId === player.id
+      ).length
+      return {
+        ...player,
+        ...(IS_MOCK
+          ? {
+              name: 'Name Player',
+            }
+          : {}),
+        matches: matchResult?.length ?? 0,
+        points: points ?? 0,
+      }
+    })
   }, [players, matches, stats])
   const goalkeepers = useMemo(() => {
     return players
