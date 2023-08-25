@@ -275,7 +275,7 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       // IS_DEVELOP && console.log('settingDocs---', settingDocs)
       setSettings(settingDocs)
       localStorage.setItem('settingUpdatedAt', JSON.stringify(moment()))
-      const champion = settingDocs.find(
+      const champion: any = settingDocs.find(
         (settingDoc: any) => settingDoc.id === 'champion'
       )
       if (champion && champion?.visible) {
