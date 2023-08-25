@@ -1,10 +1,13 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import BottomTabBar from '../../components/BottomTabBar'
 import { useRef } from 'react'
-import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { useEffectOnce } from 'react-use'
+import { Modal } from 'antd-mobile'
+import Lottie from 'react-lottie'
+import BottomTabBar from '../../components/BottomTabBar'
+import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { routes } from '../../routes'
 import { Loading } from '../../global'
+import animationData from '../../assets/confetti.json'
 
 const App = () => {
   const isFetched = useRef(false)
@@ -63,6 +66,35 @@ const App = () => {
       }
     }
     handleFetchAll()
+
+    const handleFetchChampion = async () => {
+      const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        rendererSettings: {
+          preserveAspectRatio: 'xMidYMid slice',
+          className: 'w-full',
+        },
+      }
+
+      Modal.alert({
+        content: (
+          <div className="relative">
+            <img
+              src="https://www.inlogo.vn/vnt_upload/File/Image/hinh_nen_clb_manchester_united_full_hd_13.jpg"
+              className="w-full"
+            />
+            <div className="absolute left-0 top-0">
+              <Lottie options={defaultOptions} />
+            </div>
+          </div>
+        ),
+        confirmText: 'Congrats',
+      })
+    }
+    return
+    handleFetchChampion()
   })
 
   return (
