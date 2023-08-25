@@ -26,9 +26,10 @@ export const MASTER_MOCK_DATA = {
     dishFiles: [],
   },
   SETTINGS: {
-    logo: [],
-    wifi: IS_DEVELOP ? '12345678' : '',
-    currency: IS_DEVELOP ? 'vnd' : '',
+    champion: IS_DEVELOP
+      ? 'https://www.inlogo.vn/vnt_upload/File/Image/hinh_nen_clb_manchester_united_full_hd_13.jpg'
+      : '',
+    visible: false,
   },
   NEW_TEAM: {
     teamName: IS_DEVELOP ? 'Jupiter 1' : '',

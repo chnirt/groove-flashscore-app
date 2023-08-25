@@ -24,6 +24,7 @@ export const routes = {
   ranking: '/ranking',
 
   me: '/me',
+  settings: '/settings',
 
   error: '/error',
 }
@@ -182,6 +183,16 @@ export const router = createBrowserRouter([
                   <Loadable
                     {...{
                       factory: () => import('../screens/Profile'),
+                    }}
+                  />
+                ),
+              },
+              {
+                path: routes.settings,
+                element: (
+                  <Loadable
+                    {...{
+                      factory: () => import('../screens/Settings'),
                     }}
                   />
                 ),

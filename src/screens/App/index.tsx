@@ -1,18 +1,21 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useRef } from 'react'
 import { useEffectOnce } from 'react-use'
-import { Modal } from 'antd-mobile'
-import Lottie from 'react-lottie'
 import BottomTabBar from '../../components/BottomTabBar'
 import useFlashScore from '../../context/FlashScore/useFlashScore'
 import { routes } from '../../routes'
 import { Loading } from '../../global'
-import animationData from '../../assets/confetti.json'
 
 const App = () => {
   const isFetched = useRef(false)
-  const { fetchTeam, fetchMatch, fetchPlayer, fetchStat, fetchCache } =
-    useFlashScore()
+  const {
+    fetchTeam,
+    fetchMatch,
+    fetchPlayer,
+    fetchStat,
+    fetchCache,
+    fetchSettings,
+  } = useFlashScore()
   const navigate = useNavigate()
 
   useEffectOnce(() => {
@@ -21,6 +24,7 @@ const App = () => {
     if (typeof fetchMatch !== 'function') return
     if (typeof fetchPlayer !== 'function') return
     if (typeof fetchStat !== 'function') return
+    if (typeof fetchSettings !== 'function') return
 
     if (isFetched.current) {
       return
@@ -57,6 +61,7 @@ const App = () => {
           fetchMatch(),
           fetchPlayer(),
           fetchStat(),
+          fetchSettings(),
         ])
         // do something
       } catch (e) {
@@ -65,36 +70,8 @@ const App = () => {
         Loading.get.hide()
       }
     }
+
     handleFetchAll()
-
-    const handleFetchChampion = async () => {
-      const defaultOptions = {
-        loop: true,
-        autoplay: true,
-        animationData: animationData,
-        rendererSettings: {
-          preserveAspectRatio: 'xMidYMid slice',
-          className: 'w-full',
-        },
-      }
-
-      Modal.alert({
-        content: (
-          <div className="relative">
-            <img
-              src="https://www.inlogo.vn/vnt_upload/File/Image/hinh_nen_clb_manchester_united_full_hd_13.jpg"
-              className="w-full"
-            />
-            <div className="absolute left-0 top-0">
-              <Lottie options={defaultOptions} />
-            </div>
-          </div>
-        ),
-        confirmText: 'Congrats',
-      })
-    }
-    return
-    handleFetchChampion()
   })
 
   return (

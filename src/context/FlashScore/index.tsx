@@ -10,6 +10,9 @@ import moment from 'moment'
 import { useLocalStorage } from 'usehooks-ts'
 import { getColRef } from '../../firebase/service'
 import { IS_DEVELOP, MATCH_TIMING } from '../../constants'
+import animationData from '../../assets/confetti.json'
+import { Image, Modal } from 'antd-mobile'
+import Lottie from 'react-lottie'
 
 type FlashScoreType = {
   teams?: any[]
@@ -26,6 +29,9 @@ type FlashScoreType = {
   refetchStat?: () => Promise<void>
   fetchCache?: () => Promise<any>
   localCaches?: any[]
+  fetchSettings?: () => Promise<void>
+  refetchSettings?: () => Promise<void>
+  settings?: any[]
 }
 
 export const FlashScoreContext = createContext<FlashScoreType>({})
@@ -48,6 +54,10 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
   )
   const [stats, setStats] = useLocalStorage<any[] | undefined>(
     'stats',
+    undefined
+  )
+  const [settings, setSettings] = useLocalStorage<any[] | undefined>(
+    'settings',
     undefined
   )
 
@@ -252,6 +262,56 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
     return await refetchCache()
   }, [refetchCache])
 
+  const refetchSettings = useCallback(async () => {
+    // IS_DEVELOP && console.log('refetchStat---')
+    try {
+      const settingsColGroupRef = getColRef('settings')
+      const q = query(settingsColGroupRef)
+      querySnapshot = await getDocs(q)
+      const settingDocs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      // IS_DEVELOP && console.log('settingDocs---', settingDocs)
+      setSettings(settingDocs)
+      localStorage.setItem('settingUpdatedAt', JSON.stringify(moment()))
+      const champion = settingDocs.find(
+        (settingDoc: any) => settingDoc.id === 'champion'
+      )
+      if (champion && champion?.visible) {
+        const defaultOptions = {
+          loop: true,
+          autoplay: true,
+          animationData,
+          rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice',
+            className: 'w-full',
+          },
+        }
+
+        Modal.alert({
+          content: (
+            <div className="relative">
+              <Image src={champion?.champion} className="w-full" />
+              <div className="absolute left-0 top-0">
+                <Lottie options={defaultOptions} />
+              </div>
+            </div>
+          ),
+          confirmText: 'Congrats',
+        })
+      }
+    } catch (error) {
+      if (IS_DEVELOP) {
+        console.error(error)
+      }
+    }
+  }, [setSettings])
+
+  const fetchSettings = useCallback(async () => {
+    await refetchSettings()
+  }, [refetchSettings])
+
   const value = useMemo(
     () => ({
       teams,
@@ -267,6 +327,9 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       fetchStat,
       refetchStat,
       fetchCache,
+      fetchSettings,
+      refetchSettings,
+      settings,
     }),
     [
       teams,
@@ -281,7 +344,12 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
       stats,
       fetchStat,
       refetchStat,
+
       fetchCache,
+
+      fetchSettings,
+      refetchSettings,
+      settings,
     ]
   )
   return (

@@ -1,12 +1,15 @@
 import { Dialog, Footer, List, NavBar } from 'antd-mobile'
 import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { signOutFirebase, updateProfileFirebase } from '../../firebase/service'
 import { Loading } from '../../global'
 import AvatarUploader from '../../components/AvatarUploader'
+import { routes } from '../../routes'
 
 const Profile = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
   const handleLogout = useCallback(() => {
     Dialog.confirm({
@@ -46,6 +49,9 @@ const Profile = () => {
           description={user?.email}
         >
           {user?.fullName}
+        </List.Item>
+        <List.Item onClick={() => navigate(routes.settings)}>
+          Settings
         </List.Item>
         <List.Item onClick={handleLogout} arrow={false}>
           Log out
