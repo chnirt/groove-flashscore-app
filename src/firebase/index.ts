@@ -5,7 +5,11 @@ import { getRemoteConfig } from 'firebase/remote-config'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
-import { connectFirestoreEmulator, getFirestore, writeBatch } from 'firebase/firestore'
+import {
+  connectFirestoreEmulator,
+  getFirestore,
+  writeBatch,
+} from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
 
 import { IS_DEVELOP, env } from '../constants'
@@ -39,7 +43,7 @@ export const auth = getAuth(app)
 // Create a root reference
 export const storage = getStorage()
 
-export const batch = writeBatch(db);
+export const batch = writeBatch(db)
 
 if (IS_DEVELOP) {
   const AUTH_PORT = 9099
