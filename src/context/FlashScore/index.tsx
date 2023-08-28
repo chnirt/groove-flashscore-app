@@ -292,7 +292,11 @@ export const FlashScoreProvider: FC<PropsWithChildren> = ({ children }) => {
         Modal.alert({
           content: (
             <div className="relative">
-              <Image src={champion?.champion} className="w-full" />
+              <Image
+                lazy
+                src={champion?.champion}
+                className="aspect-square w-full"
+              />
               <div className="absolute left-0 top-0">
                 <Lottie options={defaultOptions} />
               </div>
